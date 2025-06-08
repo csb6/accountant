@@ -2,7 +2,10 @@
 #include <string>
 #include <QApplication>
 #include <QSqlDatabase>
+#include <QSqlQueryModel>
 #include "sql_helpers.hpp"
+#include "AccountsModel.hpp"
+#include "MainWindow.hpp"
 
 static constexpr int latest_schema_version = 1;
 
@@ -18,5 +21,8 @@ int main(int argc, char* argv[])
     sql_helpers::upgrade_schema_if_needed(db, latest_schema_version, "schemas");
     sql_helpers::exec_query(db, "pragma foreign_keys = ON");
 
+    AccountsModel account_model{db};
+    MainWindow main_window{nullptr, account_model};
+    main_window.show();
     return app.exec();
 }
