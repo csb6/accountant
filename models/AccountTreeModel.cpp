@@ -1,4 +1,4 @@
-#include "AccountsModel.hpp"
+#include "AccountTreeModel.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -7,21 +7,21 @@
 #include <QStandardItem>
 #include <QString>
 
-struct AccountsModel::Impl {
+struct AccountTreeModel::Impl {
     QSqlQueryModel query_model;
 };
 
 static
 void build_tree(QSqlQueryModel&, QStandardItem* root);
 
-AccountsModel::AccountsModel(QSqlDatabase& db)
+AccountTreeModel::AccountTreeModel(QSqlDatabase& db)
     : QStandardItemModel(), m_impl(new Impl)
 {
     m_impl->query_model.setQuery("select name from accounts order by name", db);
     build_tree(m_impl->query_model, invisibleRootItem());
 }
 
-AccountsModel::~AccountsModel() noexcept
+AccountTreeModel::~AccountTreeModel() noexcept
 {
     delete m_impl;
 }
