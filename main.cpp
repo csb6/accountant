@@ -1,6 +1,10 @@
 #include <iostream>
+#include <string>
 #include <QApplication>
 #include <QSqlDatabase>
+#include "sql_helpers.hpp"
+
+static constexpr int latest_schema_version = 1;
 
 int main(int argc, char* argv[])
 {
@@ -11,6 +15,8 @@ int main(int argc, char* argv[])
         std::cerr << "Error: could not open accounts database\n";
         return 1;
     }
+    sql_helpers::upgrade_schema_if_needed(db, latest_schema_version, "schemas");
+    sql_helpers::exec_query(db, "pragma foreign_keys = ON");
 
     return app.exec();
 }
