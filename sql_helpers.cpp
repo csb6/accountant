@@ -40,10 +40,10 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, const
     if(schema_version > latest_schema_version) {
         throw std::runtime_error("Database has newer schema version than this software supports");
     } else if(schema_version < latest_schema_version) {
-        db.transaction();
-        try {
-            // Migrate to the latest schema
-            for(auto v = schema_version + 1; v <= latest_schema_version; ++v) {
+        // Migrate to the latest schema
+        for(auto v = schema_version + 1; v <= latest_schema_version; ++v) {
+            try {
+                db.transaction();
                 auto schema_path = schema_folder / std::format("{}-schema.sql", v);
                 std::ifstream schema_file{schema_path};
                 if(!schema_file) {
@@ -57,12 +57,12 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, const
                         exec_query(db, command);
                     }
                 }
+                exec_query(db, std::format("pragma user_version = {}", latest_schema_version));
+                db.commit();
+            } catch(const std::exception&) {
+                db.rollback();
+                throw;
             }
-            exec_query(db, std::format("pragma user_version = {}", latest_schema_version));
-            db.commit();
-        } catch(const std::exception&) {
-            db.rollback();
-            throw;
         }
     }
 }
