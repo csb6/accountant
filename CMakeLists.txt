@@ -6,7 +6,12 @@ find_package(Qt6 REQUIRED COMPONENTS Core Sql Widgets)
 
 qt_standard_project_setup()
 
-qt_add_executable(accountant mainwindow.ui main.cpp MainWindow.cpp AccountsModel.cpp sql_helpers.cpp)
+qt_add_executable(accountant
+    main.cpp
+    views/mainwindow.ui views/MainWindow.cpp
+    views/transactionsview.ui views/TransactionsView.cpp
+    models/AccountsModel.cpp
+    sql_helpers.cpp)
 target_include_directories(accountant PUBLIC .)
 target_compile_features(accountant PUBLIC cxx_std_20)
 target_compile_options(accountant PUBLIC "-pedantic-errors" "-Wall" "-Wextra")

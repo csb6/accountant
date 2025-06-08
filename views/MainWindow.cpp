@@ -1,0 +1,39 @@
+#include "MainWindow.hpp"
+#include "TransactionsView.hpp"
+#include "ui_mainwindow.h"
+
+MainWindow::MainWindow(QAbstractItemModel& accounts_model)
+    : QMainWindow(), ui(new Ui::MainWindow)
+{
+    ui->setupUi(this);
+    ui->account_view->setModel(&accounts_model);
+    auto* tab_bar = ui->tabs->tabBar();
+    // Accounts tab cannot be closed
+    tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
+    tab_bar->setTabButton(0, QTabBar::ButtonPosition::LeftSide, nullptr);
+
+    connect(ui->account_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
+    connect(ui->tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
+        auto* tab = ui->tabs->widget(tab_index);
+        ui->tabs->removeTab(tab_index);
+        // Needed since removeTab doesn't delete the object
+        delete tab;
+    });
+}
+
+MainWindow::~MainWindow() noexcept
+{
+    delete ui;
+}
+
+void MainWindow::open_transactions_view(QModelIndex account)
+{
+    auto tab_name = account.data().toString();
+    // Don't add new tab if already open (TODO: name clashes in nested accounts)
+    for(int i = 0; i < ui->tabs->count(); ++i) {
+        if(ui->tabs->tabText(i) == tab_name) {
+            return;
+        }
+    }
+    ui->tabs->addTab(new TransactionsView(), tab_name);
+}

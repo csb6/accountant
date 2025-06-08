@@ -14,8 +14,10 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit
-    MainWindow(QWidget* parent, QAbstractItemModel& accounts_model);
+    MainWindow(QAbstractItemModel& accounts_model);
     ~MainWindow() noexcept;
+private slots:
+    void open_transactions_view(QModelIndex account);
 private:
     Ui::MainWindow* ui;
 };
