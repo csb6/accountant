@@ -26,6 +26,11 @@ AccountTreeModel::~AccountTreeModel() noexcept
     delete m_impl;
 }
 
+AccountModel* AccountTreeModel::account_at(QModelIndex index)
+{
+    return new AccountModel{index.data().toString()};
+}
+
 static
 void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
 {

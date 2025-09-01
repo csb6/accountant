@@ -1,12 +1,13 @@
 #include "MainWindow.hpp"
+#include "models/AccountTreeModel.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
-MainWindow::MainWindow(QAbstractItemModel& accounts_model)
+MainWindow::MainWindow(AccountTreeModel& account_tree)
     : QMainWindow(), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->account_view->setModel(&accounts_model);
+    ui->account_view->setModel(&account_tree);
     auto* tab_bar = ui->tabs->tabBar();
     // Accounts tab cannot be closed
     tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
@@ -35,5 +36,7 @@ void MainWindow::open_transactions_view(QModelIndex account)
             return;
         }
     }
-    ui->tabs->addTab(new TransactionsView(), tab_name);
+    auto* account_tree = static_cast<AccountTreeModel*>(ui->account_view->model());
+    auto* transactions_view = new TransactionsView(account_tree->account_at(account));
+    ui->tabs->addTab(transactions_view, tab_name);
 }

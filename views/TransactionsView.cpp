@@ -1,13 +1,20 @@
 #include "TransactionsView.hpp"
+#include "models/AccountModel.hpp"
 #include "ui_transactionsview.h"
 
-TransactionsView::TransactionsView()
-    : QFrame(), ui(new Ui::TransactionsView())
+struct TransactionsView::Impl {
+    AccountModel* account;
+    Ui::TransactionsView ui;
+};
+
+TransactionsView::TransactionsView(AccountModel* account)
+    : QFrame(), m_impl(new Impl(account))
 {
-    ui->setupUi(this);
+    m_impl->ui.setupUi(this);
 }
 
 TransactionsView::~TransactionsView() noexcept
 {
-    delete ui;
+    delete m_impl->account;
+    delete m_impl;
 }

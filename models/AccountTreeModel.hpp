@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QStandardItemModel>
+#include "AccountModel.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSqlDatabase;
@@ -12,6 +13,8 @@ public:
     explicit
     AccountTreeModel(QSqlDatabase&);
     ~AccountTreeModel() noexcept;
+
+    AccountModel* account_at(QModelIndex);
 private:
     struct Impl;
     Impl* m_impl;

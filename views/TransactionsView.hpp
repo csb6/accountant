@@ -6,12 +6,15 @@ namespace Ui {
     class TransactionsView;
 }
 
+class AccountModel;
+
 class TransactionsView : public QFrame {
     Q_OBJECT
 public:
     explicit
-    TransactionsView();
+    TransactionsView(AccountModel*);
     ~TransactionsView() noexcept;
 private:
-    Ui::TransactionsView* ui;
+    struct Impl;
+    Impl* m_impl;
 };
