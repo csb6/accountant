@@ -33,6 +33,7 @@ void MainWindow::open_transactions_view(QModelIndex account)
     // Don't add new tab if already open (TODO: name clashes in nested accounts)
     for(int i = 0; i < ui->tabs->count(); ++i) {
         if(ui->tabs->tabText(i) == tab_name) {
+            ui->tabs->setCurrentIndex(i);
             return;
         }
     }
@@ -42,5 +43,6 @@ void MainWindow::open_transactions_view(QModelIndex account)
         return;
     }
     auto* transactions_view = new TransactionsView(std::move(account_model));
-    ui->tabs->addTab(transactions_view, tab_name);
+    auto tab_index = ui->tabs->addTab(transactions_view, tab_name);
+    ui->tabs->setCurrentIndex(tab_index);
 }
