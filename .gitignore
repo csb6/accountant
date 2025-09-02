@@ -2,3 +2,4 @@ build/
 .cache/
 *.db
 .vscode/
+CMakeUserPresets.json

@@ -1,0 +1,18 @@
+{
+    "version": 8,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 29
+    },
+    "configurePresets": [
+        {
+            "name": "default",
+            "hidden": true,
+            "cacheVariables": {
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "CMAKE_CXX_EXTENSIONS": false
+            },
+            "binaryDir": "build"
+        }
+    ]
+}
