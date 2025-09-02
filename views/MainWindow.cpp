@@ -37,6 +37,10 @@ void MainWindow::open_transactions_view(QModelIndex account)
         }
     }
     auto* account_tree = static_cast<AccountTreeModel*>(ui->account_view->model());
-    auto* transactions_view = new TransactionsView(account_tree->account_at(account));
+    auto account_model = account_tree->account_at(account);
+    if(!account_model) {
+        return;
+    }
+    auto* transactions_view = new TransactionsView(std::move(account_model));
     ui->tabs->addTab(transactions_view, tab_name);
 }

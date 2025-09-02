@@ -35,6 +35,10 @@ AccountTreeModel::~AccountTreeModel() noexcept
 std::unique_ptr<AccountModel> AccountTreeModel::account_at(QModelIndex index)
 {
     auto* item = itemFromIndex(index);
+    if(item->hasChildren()) {
+        // Parent accounts don't have transactions of their own
+        return {};
+    }
     auto account_id = item->data(Account_ID_Role).toInt();
     return std::make_unique<AccountModel>(*m_impl->db, account_id);
 }
@@ -59,10 +63,12 @@ void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
         // Add all of the new parts to the tree (and the stack)
         for(auto part = first_new_part; part != parts.end(); ++part) {
             auto* new_item = new QStandardItem(*part);
-            new_item->setData(account_id, Account_ID_Role);
             account_stack.back()->appendRow(new_item);
             account_stack.push_back(new_item);
             account_name_stack.push_back(*part);
+        }
+        if(!account_stack.empty()) {
+            account_stack.back()->setData(account_id, Account_ID_Role);
         }
     }
 }
