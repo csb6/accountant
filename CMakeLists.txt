@@ -3,6 +3,13 @@ cmake_minimum_required(VERSION 3.29)
 project(Accountant LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Sql Widgets)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(libofx "libofx" IMPORTED_TARGET REQUIRED)
+
+add_executable(ofx_demo ofx_demo.cpp)
+target_compile_features(ofx_demo PUBLIC cxx_std_20)
+target_compile_options(ofx_demo PUBLIC "-pedantic-errors" "-Wall" "-Wextra")
+target_link_libraries(ofx_demo PUBLIC PkgConfig::libofx)
 
 qt_standard_project_setup()
 
