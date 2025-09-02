@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <QStandardItemModel>
 #include "AccountModel.hpp"
 
@@ -14,7 +15,7 @@ public:
     AccountTreeModel(QSqlDatabase&);
     ~AccountTreeModel() noexcept;
 
-    AccountModel* account_at(QModelIndex);
+    std::unique_ptr<AccountModel> account_at(QModelIndex);
 private:
     struct Impl;
     Impl* m_impl;

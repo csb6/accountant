@@ -1,10 +1,7 @@
 #pragma once
 
+#include <memory>
 #include <QFrame>
-
-namespace Ui {
-    class TransactionsView;
-}
 
 class AccountModel;
 
@@ -12,7 +9,7 @@ class TransactionsView : public QFrame {
     Q_OBJECT
 public:
     explicit
-    TransactionsView(AccountModel*);
+    TransactionsView(std::unique_ptr<AccountModel>);
     ~TransactionsView() noexcept;
 private:
     struct Impl;

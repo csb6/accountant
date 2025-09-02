@@ -32,11 +32,11 @@ AccountTreeModel::~AccountTreeModel() noexcept
     delete m_impl;
 }
 
-AccountModel* AccountTreeModel::account_at(QModelIndex index)
+std::unique_ptr<AccountModel> AccountTreeModel::account_at(QModelIndex index)
 {
     auto* item = itemFromIndex(index);
     auto account_id = item->data(Account_ID_Role).toInt();
-    return new AccountModel{*m_impl->db, account_id};
+    return std::make_unique<AccountModel>(*m_impl->db, account_id);
 }
 
 static
