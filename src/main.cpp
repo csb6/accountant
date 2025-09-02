@@ -21,7 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
-#include "sql_helpers.hpp"
+#include "util/sql_helpers.hpp"
 #include "models/AccountTreeModel.hpp"
 #include "views/MainWindow.hpp"
 
