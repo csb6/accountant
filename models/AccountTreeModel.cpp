@@ -68,7 +68,9 @@ void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
             account_name_stack.push_back(*part);
         }
         if(!account_stack.empty()) {
-            account_stack.back()->setData(account_id, Account_ID_Role);
+            auto* new_item = account_stack.back();
+            new_item->setData(account_id, Account_ID_Role);
+            new_item->setData(account_path, Account_Path_Role);
         }
     }
 }

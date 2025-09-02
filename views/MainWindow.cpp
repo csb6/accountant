@@ -2,6 +2,7 @@
 #include "models/AccountTreeModel.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
+#include "models/Roles.hpp"
 
 MainWindow::MainWindow(AccountTreeModel& account_tree)
     : QMainWindow(), ui(new Ui::MainWindow)
@@ -29,8 +30,8 @@ MainWindow::~MainWindow() noexcept
 
 void MainWindow::open_transactions_view(QModelIndex account)
 {
-    auto tab_name = account.data().toString();
-    // Don't add new tab if already open (TODO: name clashes in nested accounts)
+    auto tab_name = account.data(Account_Path_Role).toString();
+    // Don't add new tab if already open
     for(int i = 0; i < ui->tabs->count(); ++i) {
         if(ui->tabs->tabText(i) == tab_name) {
             ui->tabs->setCurrentIndex(i);
