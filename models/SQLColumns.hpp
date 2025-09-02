@@ -1,0 +1,15 @@
+#pragma once
+
+enum TransactionsTable {
+    TRANSACTIONS_ID,
+    TRANSACTIONS_DATE,
+    TRANSACTIONS_SOURCE,
+    TRANSACTIONS_DESTINATION,
+    TRANSACTIONS_AMOUNT,
+};
+
+enum AccountsTable {
+    ACCOUNTS_ID,
+    ACCOUNTS_NAME,
+    ACCOUNTS_KIND
+};

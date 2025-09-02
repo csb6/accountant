@@ -6,8 +6,14 @@
 #include <QSqlDatabase>
 #include <QStandardItem>
 #include <QString>
+#include "models/Roles.hpp"
+#include "models/SQLColumns.hpp"
 
 struct AccountTreeModel::Impl {
+    explicit
+    Impl(QSqlDatabase* db) : db(db) {}
+
+    QSqlDatabase* db;
     QSqlQueryModel query_model;
 };
 
@@ -15,9 +21,9 @@ static
 void build_tree(QSqlQueryModel&, QStandardItem* root);
 
 AccountTreeModel::AccountTreeModel(QSqlDatabase& db)
-    : QStandardItemModel(), m_impl(new Impl)
+    : QStandardItemModel(), m_impl(new Impl{&db})
 {
-    m_impl->query_model.setQuery("select name from accounts order by name", db);
+    m_impl->query_model.setQuery("select id, name from accounts order by name", db);
     build_tree(m_impl->query_model, invisibleRootItem());
 }
 
@@ -28,7 +34,9 @@ AccountTreeModel::~AccountTreeModel() noexcept
 
 AccountModel* AccountTreeModel::account_at(QModelIndex index)
 {
-    return new AccountModel{index.data().toString()};
+    auto* item = itemFromIndex(index);
+    auto account_id = item->data(Account_ID_Role).toInt();
+    return new AccountModel{*m_impl->db, account_id};
 }
 
 static
@@ -37,9 +45,8 @@ void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
     std::vector<QString> account_name_stack;
     std::vector<QStandardItem*> account_stack{root};
     for(int row = 0; row < query_model.rowCount(); ++row) {
-        // Note: assumes single column
-        auto sql_index = query_model.index(row, 0, QModelIndex{});
-        auto account_path = sql_index.data().toString();
+        auto account_id = query_model.index(row, ACCOUNTS_ID).data().toInt();
+        auto account_path = query_model.index(row, ACCOUNTS_NAME).data().toString();
         auto parts = account_path.split('/');
         // Pop items from the stack until the stack is a prefix of parts
         // This means we are at a point in the tree where we can add new parts
@@ -52,6 +59,7 @@ void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
         // Add all of the new parts to the tree (and the stack)
         for(auto part = first_new_part; part != parts.end(); ++part) {
             auto* new_item = new QStandardItem(*part);
+            new_item->setData(account_id, Account_ID_Role);
             account_stack.back()->appendRow(new_item);
             account_stack.push_back(new_item);
             account_name_stack.push_back(*part);
