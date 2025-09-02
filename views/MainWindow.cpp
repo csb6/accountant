@@ -45,5 +45,6 @@ void MainWindow::open_transactions_view(QModelIndex account)
     }
     auto* transactions_view = new TransactionsView(std::move(account_model));
     auto tab_index = ui->tabs->addTab(transactions_view, tab_name);
+    ui->tabs->setTabToolTip(tab_index, tab_name);
     ui->tabs->setCurrentIndex(tab_index);
 }
