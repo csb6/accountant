@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "AccountTreeModel.hpp"
+#include "AccountTree.hpp"
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/Roles.hpp"
 #include "models/SQLColumns.hpp"
 
-struct AccountTreeModel::Impl {
+struct AccountTree::Impl {
     explicit
     Impl(QSqlDatabase* db) : db(db) {}
 
@@ -38,19 +38,19 @@ struct AccountTreeModel::Impl {
 static
 void build_tree(QSqlQueryModel&, QStandardItem* root);
 
-AccountTreeModel::AccountTreeModel(QSqlDatabase& db)
+AccountTree::AccountTree(QSqlDatabase& db)
     : QStandardItemModel(), m_impl(new Impl{&db})
 {
     m_impl->query_model.setQuery("select id, name from accounts order by name", db);
     build_tree(m_impl->query_model, invisibleRootItem());
 }
 
-AccountTreeModel::~AccountTreeModel() noexcept
+AccountTree::~AccountTree() noexcept
 {
     delete m_impl;
 }
 
-std::unique_ptr<AccountModel> AccountTreeModel::account_at(QModelIndex index)
+std::unique_ptr<Account> AccountTree::account_at(QModelIndex index)
 {
     auto* item = itemFromIndex(index);
     if(item->hasChildren()) {
@@ -58,7 +58,7 @@ std::unique_ptr<AccountModel> AccountTreeModel::account_at(QModelIndex index)
         return {};
     }
     auto account_id = item->data(Account_ID_Role).toInt();
-    return std::make_unique<AccountModel>(*m_impl->db, account_id);
+    return std::make_unique<Account>(*m_impl->db, account_id);
 }
 
 static

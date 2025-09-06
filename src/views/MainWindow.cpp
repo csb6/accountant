@@ -17,12 +17,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "MainWindow.hpp"
-#include "models/AccountTreeModel.hpp"
+#include "models/AccountTree.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 #include "models/Roles.hpp"
 
-MainWindow::MainWindow(AccountTreeModel& account_tree)
+MainWindow::MainWindow(AccountTree& account_tree)
     : QMainWindow(), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -56,7 +56,7 @@ void MainWindow::open_transactions_view(QModelIndex account)
             return;
         }
     }
-    auto* account_tree = static_cast<AccountTreeModel*>(ui->account_tree_view->model());
+    auto* account_tree = static_cast<AccountTree*>(ui->account_tree_view->model());
     auto account_model = account_tree->account_at(account);
     if(!account_model) {
         return;

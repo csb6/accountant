@@ -24,13 +24,13 @@ namespace Ui {
     class MainWindow;
 }
 
-class AccountTreeModel;
+class AccountTree;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
     explicit
-    MainWindow(AccountTreeModel&);
+    MainWindow(AccountTree&);
     ~MainWindow() noexcept;
 private slots:
     void open_transactions_view(QModelIndex account);

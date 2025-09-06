@@ -21,13 +21,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <memory>
 #include <QFrame>
 
-class AccountModel;
+class Account;
 
 class TransactionsView : public QFrame {
     Q_OBJECT
 public:
     explicit
-    TransactionsView(std::unique_ptr<AccountModel>);
+    TransactionsView(std::unique_ptr<Account>);
     ~TransactionsView() noexcept;
 private:
     struct Impl;

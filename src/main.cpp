@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
 #include "util/sql_helpers.hpp"
-#include "models/AccountTreeModel.hpp"
+#include "models/AccountTree.hpp"
 #include "views/MainWindow.hpp"
 
 static constexpr int latest_schema_version = 1;
@@ -39,8 +39,8 @@ int main(int argc, char* argv[])
     sql_helpers::upgrade_schema_if_needed(db, latest_schema_version, "schemas");
     sql_helpers::exec_query(db, "pragma foreign_keys = ON");
 
-    AccountTreeModel account_model{db};
-    MainWindow main_window{account_model};
+    AccountTree account_tree{db};
+    MainWindow main_window{account_tree};
     main_window.show();
     return app.exec();
 }

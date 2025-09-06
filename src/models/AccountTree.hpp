@@ -20,20 +20,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <memory>
 #include <QStandardItemModel>
-#include "AccountModel.hpp"
+#include "Account.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSqlDatabase;
 QT_END_NAMESPACE
 
-class AccountTreeModel : public QStandardItemModel {
+class AccountTree : public QStandardItemModel {
     Q_OBJECT
 public:
     explicit
-    AccountTreeModel(QSqlDatabase&);
-    ~AccountTreeModel() noexcept;
+    AccountTree(QSqlDatabase&);
+    ~AccountTree() noexcept;
 
-    std::unique_ptr<AccountModel> account_at(QModelIndex);
+    std::unique_ptr<Account> account_at(QModelIndex);
 private:
     struct Impl;
     Impl* m_impl;

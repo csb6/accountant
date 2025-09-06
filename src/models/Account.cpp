@@ -16,11 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "AccountModel.hpp"
+#include "Account.hpp"
 #include <QDate>
 #include "SQLColumns.hpp"
 
-AccountModel::AccountModel(QSqlDatabase& db, int account_id)
+Account::Account(QSqlDatabase& db, int account_id)
     : QSqlRelationalTableModel(nullptr, db)
 {
     setTable("transactions");
@@ -33,7 +33,7 @@ AccountModel::AccountModel(QSqlDatabase& db, int account_id)
     select();
 }
 
-QVariant AccountModel::data(const QModelIndex& index, int role) const
+QVariant Account::data(const QModelIndex& index, int role) const
 {
     if(role != Qt::DisplayRole) {
         return QSqlRelationalTableModel::data(index, role);
