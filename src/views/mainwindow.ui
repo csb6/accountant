@@ -76,7 +76,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
          <number>0</number>
         </property>
         <item>
-         <widget class="QTreeView" name="account_view">
+         <widget class="QTreeView" name="account_tree_view">
           <property name="editTriggers">
            <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
           </property>

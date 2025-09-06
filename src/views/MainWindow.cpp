@@ -26,13 +26,13 @@ MainWindow::MainWindow(AccountTreeModel& account_tree)
     : QMainWindow(), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui->account_view->setModel(&account_tree);
+    ui->account_tree_view->setModel(&account_tree);
     auto* tab_bar = ui->tabs->tabBar();
     // Accounts tab cannot be closed
     tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
     tab_bar->setTabButton(0, QTabBar::ButtonPosition::LeftSide, nullptr);
 
-    connect(ui->account_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
+    connect(ui->account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
     connect(ui->tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
         auto* tab = ui->tabs->widget(tab_index);
         ui->tabs->removeTab(tab_index);
@@ -56,7 +56,7 @@ void MainWindow::open_transactions_view(QModelIndex account)
             return;
         }
     }
-    auto* account_tree = static_cast<AccountTreeModel*>(ui->account_view->model());
+    auto* account_tree = static_cast<AccountTreeModel*>(ui->account_tree_view->model());
     auto account_model = account_tree->account_at(account);
     if(!account_model) {
         return;
