@@ -51,6 +51,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
      <property name="editTriggers">
       <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
      </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
     </widget>
    </item>
   </layout>

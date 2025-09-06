@@ -32,7 +32,7 @@ TransactionsView::TransactionsView(std::unique_ptr<Account> account)
     m_impl->ui.setupUi(this);
     m_impl->ui.transactions_view->setModel(m_impl->account.get());
     m_impl->ui.transactions_view->hideColumn(TRANSACTIONS_ID);
-    m_impl->ui.transactions_view->verticalHeader()->setVisible(false);
+    m_impl->ui.transactions_view->resizeColumnsToContents();
 }
 
 TransactionsView::~TransactionsView() noexcept
