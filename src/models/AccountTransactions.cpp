@@ -16,11 +16,11 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Account.hpp"
+#include "AccountTransactions.hpp"
 #include <QDate>
 #include "SQLColumns.hpp"
 
-Account::Account(QSqlDatabase& db, int account_id)
+AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
     : QSqlRelationalTableModel(nullptr, db)
 {
     setTable("transactions");
@@ -34,7 +34,7 @@ Account::Account(QSqlDatabase& db, int account_id)
     select();
 }
 
-QVariant Account::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant AccountTransactions::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole) {
         auto col_name = QSqlRelationalTableModel::headerData(section, orientation, role).toString();
@@ -47,7 +47,7 @@ QVariant Account::headerData(int section, Qt::Orientation orientation, int role)
     return QSqlRelationalTableModel::headerData(section, orientation, role);
 }
 
-QVariant Account::data(const QModelIndex& index, int role) const
+QVariant AccountTransactions::data(const QModelIndex& index, int role) const
 {
     if(role == Qt::DisplayRole) {
         if(index.column() == TRANSACTIONS_DATE) {

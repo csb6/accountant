@@ -18,20 +18,19 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "TransactionsView.hpp"
 #include <QSqlRelationalDelegate>
-#include "models/Account.hpp"
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
 
 struct TransactionsView::Impl {
-    std::unique_ptr<Account> account;
+    std::unique_ptr<QSqlRelationalTableModel> transactions;
     Ui::TransactionsView ui;
 };
 
-TransactionsView::TransactionsView(std::unique_ptr<Account> account)
-    : QFrame(), m_impl(new Impl(std::move(account)))
+TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> transactions)
+    : QFrame(), m_impl(new Impl(std::move(transactions)))
 {
     m_impl->ui.setupUi(this);
-    m_impl->ui.transactions_view->setModel(m_impl->account.get());
+    m_impl->ui.transactions_view->setModel(m_impl->transactions.get());
     m_impl->ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_impl->ui.transactions_view));
     m_impl->ui.transactions_view->hideColumn(TRANSACTIONS_ID);
     m_impl->ui.transactions_view->resizeColumnsToContents();

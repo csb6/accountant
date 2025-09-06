@@ -20,14 +20,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <memory>
 #include <QFrame>
-
-class Account;
+#include <QSqlRelationalTableModel>
 
 class TransactionsView : public QFrame {
     Q_OBJECT
 public:
     explicit
-    TransactionsView(std::unique_ptr<Account>);
+    TransactionsView(std::unique_ptr<QSqlRelationalTableModel>);
     ~TransactionsView() noexcept;
 private:
     struct Impl;

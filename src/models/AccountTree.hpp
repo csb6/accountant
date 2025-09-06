@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <memory>
 #include <QStandardItemModel>
-#include "Account.hpp"
+#include "AccountTransactions.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSqlDatabase;
@@ -33,7 +33,7 @@ public:
     AccountTree(QSqlDatabase&);
     ~AccountTree() noexcept;
 
-    std::unique_ptr<Account> account_at(QModelIndex);
+    std::unique_ptr<AccountTransactions> account_transactions(QModelIndex);
 private:
     struct Impl;
     Impl* m_impl;

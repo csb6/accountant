@@ -57,11 +57,11 @@ void MainWindow::open_transactions_view(QModelIndex account)
         }
     }
     auto* account_tree = static_cast<AccountTree*>(ui->account_tree_view->model());
-    auto account_model = account_tree->account_at(account);
-    if(!account_model) {
+    auto account_transactions = account_tree->account_transactions(account);
+    if(!account_transactions) {
         return;
     }
-    auto* transactions_view = new TransactionsView(std::move(account_model));
+    auto* transactions_view = new TransactionsView(std::move(account_transactions));
     auto tab_index = ui->tabs->addTab(transactions_view, tab_name);
     ui->tabs->setTabToolTip(tab_index, tab_name);
     ui->tabs->setCurrentIndex(tab_index);

@@ -24,8 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSqlDatabase>
 #include <QStandardItem>
 #include <QString>
-#include "models/Roles.hpp"
-#include "models/SQLColumns.hpp"
+#include "Roles.hpp"
+#include "SQLColumns.hpp"
 
 struct AccountTree::Impl {
     explicit
@@ -50,7 +50,7 @@ AccountTree::~AccountTree() noexcept
     delete m_impl;
 }
 
-std::unique_ptr<Account> AccountTree::account_at(QModelIndex index)
+std::unique_ptr<AccountTransactions> AccountTree::account_transactions(QModelIndex index)
 {
     auto* item = itemFromIndex(index);
     if(item->hasChildren()) {
@@ -58,7 +58,7 @@ std::unique_ptr<Account> AccountTree::account_at(QModelIndex index)
         return {};
     }
     auto account_id = item->data(Account_ID_Role).toInt();
-    return std::make_unique<Account>(*m_impl->db, account_id);
+    return std::make_unique<AccountTransactions>(*m_impl->db, account_id);
 }
 
 static

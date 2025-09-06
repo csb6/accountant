@@ -21,10 +21,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSqlRelationalTableModel>
 #include <QString>
 
-class Account : public QSqlRelationalTableModel {
+class AccountTransactions : public QSqlRelationalTableModel {
     Q_OBJECT
 public:
-    Account(QSqlDatabase&, int account_id);
+    AccountTransactions(QSqlDatabase&, int account_id);
 
     QVariant headerData(int section, Qt::Orientation, int role) const override;
     QVariant data(const QModelIndex&, int role) const override;
