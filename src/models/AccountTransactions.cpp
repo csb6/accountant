@@ -36,15 +36,16 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
 
 QVariant AccountTransactions::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    auto header_data = QSqlRelationalTableModel::headerData(section, orientation, role);
     if(orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole) {
-        auto col_name = QSqlRelationalTableModel::headerData(section, orientation, role).toString();
+        auto col_name = header_data.toString();
         if(!col_name.isEmpty()) {
             // Capitalize first letter of each column name
             col_name[0] = col_name[0].toUpper();
         }
-        return col_name;
+        header_data = col_name;
     }
-    return QSqlRelationalTableModel::headerData(section, orientation, role);
+    return header_data;
 }
 
 QVariant AccountTransactions::data(const QModelIndex& index, int role) const
