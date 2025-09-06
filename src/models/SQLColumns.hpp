@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-enum TransactionsTable {
+enum TransactionsTableColumn {
     TRANSACTIONS_ID,
     TRANSACTIONS_DATE,
     TRANSACTIONS_SOURCE,
@@ -26,7 +26,7 @@ enum TransactionsTable {
     TRANSACTIONS_AMOUNT,
 };
 
-enum AccountsTable {
+enum AccountsTableColumn {
     ACCOUNTS_ID,
     ACCOUNTS_NAME,
     ACCOUNTS_KIND

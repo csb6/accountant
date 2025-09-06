@@ -29,9 +29,22 @@ Account::Account(QSqlDatabase& db, int account_id)
     setRelation(TRANSACTIONS_DESTINATION, QSqlRelation{"accounts", "id", "name"});
     setHeaderData(TRANSACTIONS_DESTINATION, Qt::Horizontal, "destination");
     setFilter(QString("source = %1 or destination = %1").arg(account_id));
-    setEditStrategy(EditStrategy::OnFieldChange);
+    setEditStrategy(EditStrategy::OnRowChange);
 
     select();
+}
+
+QVariant Account::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole) {
+        auto col_name = QSqlRelationalTableModel::headerData(section, orientation, role).toString();
+        if(!col_name.isEmpty()) {
+            // Capitalize first letter of each column name
+            col_name[0] = col_name[0].toUpper();
+        }
+        return col_name;
+    }
+    return QSqlRelationalTableModel::headerData(section, orientation, role);
 }
 
 QVariant Account::data(const QModelIndex& index, int role) const

@@ -26,5 +26,6 @@ class Account : public QSqlRelationalTableModel {
 public:
     Account(QSqlDatabase&, int account_id);
 
+    QVariant headerData(int section, Qt::Orientation, int role) const override;
     QVariant data(const QModelIndex&, int role) const override;
 };
