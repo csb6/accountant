@@ -17,21 +17,36 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "TransactionsView.hpp"
+#include <QErrorMessage>
+#include <QSqlError>
 #include <QSqlRelationalDelegate>
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
 
 struct TransactionsView::Impl {
     std::unique_ptr<QSqlRelationalTableModel> transactions;
+    QErrorMessage* error_modal;
     Ui::TransactionsView ui;
 };
 
 TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> transactions)
-    : QFrame(), m_impl(new Impl(std::move(transactions)))
+    : QFrame(), m_impl(new Impl(std::move(transactions), new QErrorMessage(this)))
 {
     m_impl->ui.setupUi(this);
+    m_impl->error_modal->setModal(true);
     m_impl->ui.transactions_view->setModel(m_impl->transactions.get());
     m_impl->ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_impl->ui.transactions_view));
+    connect(m_impl->ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
+        auto last_error = m_impl->transactions->lastError();
+        if(last_error.type() == QSqlError::NoError) {
+            // Resize columns whenever a cell is edited (since this could change the width of its column)
+            m_impl->ui.transactions_view->resizeColumnsToContents();
+        } else if(!m_impl->error_modal->isVisible()) {
+            // Note: commitData is called twice when editing a cell (for some reason), so we check if the modal
+            //  has already been opened to avoid opening the modal twice
+            m_impl->error_modal->showMessage(last_error.databaseText());
+        }
+    });
     m_impl->ui.transactions_view->hideColumn(TRANSACTIONS_ID);
     m_impl->ui.transactions_view->resizeColumnsToContents();
 }
