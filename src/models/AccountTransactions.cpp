@@ -29,7 +29,9 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
     setRelation(TRANSACTIONS_DESTINATION, QSqlRelation{"accounts", "id", "name"});
     setHeaderData(TRANSACTIONS_DESTINATION, Qt::Horizontal, "destination");
     setFilter(QString("source = %1 or destination = %1").arg(account_id));
-    setEditStrategy(EditStrategy::OnFieldChange);
+    // Note: can't use OnItemChange because that causes the foreign keys to be exposed
+    //  when editing (instead of the human-readable names those keys are mapped to)
+    setEditStrategy(EditStrategy::OnManualSubmit);
 
     select();
 }
