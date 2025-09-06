@@ -38,6 +38,7 @@ int main(int argc, char* argv[])
     parser.addPositionalArgument("database_path", "Path of the database");
     parser.process(app);
     auto args = parser.positionalArguments();
+    // TODO: if no database path provided, create a new empty database, prompt user to save
     if(args.size() != 1) {
         std::cerr << parser.helpText().toStdString() << "\n";
         return 1;

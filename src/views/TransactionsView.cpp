@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "TransactionsView.hpp"
+#include <QSqlRelationalDelegate>
 #include "models/Account.hpp"
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
@@ -31,6 +32,7 @@ TransactionsView::TransactionsView(std::unique_ptr<Account> account)
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.transactions_view->setModel(m_impl->account.get());
+    m_impl->ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_impl->ui.transactions_view));
     m_impl->ui.transactions_view->hideColumn(TRANSACTIONS_ID);
     m_impl->ui.transactions_view->resizeColumnsToContents();
 }

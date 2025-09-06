@@ -29,19 +29,18 @@ Account::Account(QSqlDatabase& db, int account_id)
     setRelation(TRANSACTIONS_DESTINATION, QSqlRelation{"accounts", "id", "name"});
     setHeaderData(TRANSACTIONS_DESTINATION, Qt::Horizontal, "destination");
     setFilter(QString("source = %1 or destination = %1").arg(account_id));
+    setEditStrategy(EditStrategy::OnFieldChange);
 
     select();
 }
 
 QVariant Account::data(const QModelIndex& index, int role) const
 {
-    if(role != Qt::DisplayRole) {
-        return QSqlRelationalTableModel::data(index, role);
+    if(role == Qt::DisplayRole) {
+        if(index.column() == TRANSACTIONS_DATE) {
+            auto isoDateStr = QSqlRelationalTableModel::data(index, role).toString();
+            return QDate::fromString(isoDateStr, Qt::ISODate);
+        }
     }
-
-    if(index.column() == TRANSACTIONS_DATE) {
-        auto isoDateStr = QSqlRelationalTableModel::data(index, role).toString();
-        return QDate::fromString(isoDateStr, Qt::ISODate);
-    }
-    return QSqlQueryModel::data(index, role);
+    return QSqlRelationalTableModel::data(index, role);
 }
