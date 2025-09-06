@@ -19,8 +19,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <iostream>
 #include <string>
 #include <QApplication>
+#include <QCommandLineParser>
 #include <QSqlDatabase>
 #include <QSqlQueryModel>
+#include <QString>
 #include "util/sql_helpers.hpp"
 #include "models/AccountTree.hpp"
 #include "views/MainWindow.hpp"
@@ -30,8 +32,19 @@ static constexpr int latest_schema_version = 1;
 int main(int argc, char* argv[])
 {
     QApplication app{argc, argv};
+    QCommandLineParser parser;
+    parser.setApplicationDescription("Accounting program");
+    parser.addHelpOption();
+    parser.addPositionalArgument("database_path", "Path of the database");
+    parser.process(app);
+    auto args = parser.positionalArguments();
+    if(args.size() != 1) {
+        std::cerr << parser.helpText().toStdString() << "\n";
+        return 1;
+    }
+
     auto db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("accounts.db");
+    db.setDatabaseName(args[0]);
     if(!db.open()) {
         std::cerr << "Error: could not open accounts database\n";
         return 1;
