@@ -119,6 +119,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
        <property name="editTriggers">
         <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
        </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
+       </property>
        <attribute name="verticalHeaderVisible">
         <bool>false</bool>
        </attribute>
