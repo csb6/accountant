@@ -32,6 +32,7 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
     // Note: can't use OnItemChange because that causes the foreign keys to be exposed
     //  when editing (instead of the human-readable names those keys are mapped to)
     setEditStrategy(EditStrategy::OnManualSubmit);
+    setSort(TRANSACTIONS_DATE, Qt::SortOrder::AscendingOrder);
 
     select();
 }
