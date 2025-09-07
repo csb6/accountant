@@ -30,7 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   <property name="lineWidth">
    <number>0</number>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -44,90 +44,86 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <number>0</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QHBoxLayout" name="toolbar">
      <item>
-      <layout class="QHBoxLayout" name="toolbar">
-       <item>
-        <widget class="QToolButton" name="new_transaction">
-         <property name="toolTip">
-          <string>New Transaction</string>
-         </property>
-         <property name="text">
-          <string>New Transaction</string>
-         </property>
-         <property name="icon">
-          <iconset theme="QIcon::ThemeIcon::ListAdd"/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="delete_transaction">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="toolTip">
-          <string>Delete Transaction</string>
-         </property>
-         <property name="text">
-          <string>Delete Transaction</string>
-         </property>
-         <property name="icon">
-          <iconset theme="QIcon::ThemeIcon::ListRemove"/>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="submit_changes">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Submit Changes</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QToolButton" name="revert_changes">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <property name="text">
-          <string>Revert Changes</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer">
-         <property name="orientation">
-          <enum>Qt::Orientation::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <widget class="QTableView" name="transactions_view">
-       <property name="lineWidth">
-        <number>0</number>
+      <widget class="QToolButton" name="new_transaction">
+       <property name="toolTip">
+        <string>New Transaction</string>
        </property>
-       <property name="editTriggers">
-        <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
+       <property name="text">
+        <string>New Transaction</string>
        </property>
-       <property name="sortingEnabled">
-        <bool>true</bool>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::ListAdd"/>
        </property>
-       <attribute name="verticalHeaderVisible">
-        <bool>false</bool>
-       </attribute>
       </widget>
      </item>
+     <item>
+      <widget class="QToolButton" name="delete_transaction">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Delete Transaction</string>
+       </property>
+       <property name="text">
+        <string>Delete Transaction</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="submit_changes">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Submit Changes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="revert_changes">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>Revert Changes</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Orientation::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QTableView" name="transactions_view">
+     <property name="lineWidth">
+      <number>0</number>
+     </property>
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
+     </property>
+     <property name="sortingEnabled">
+      <bool>true</bool>
+     </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
    </item>
   </layout>
  </widget>
