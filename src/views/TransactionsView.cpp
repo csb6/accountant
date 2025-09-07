@@ -63,6 +63,9 @@ struct TransactionsView::Impl {
         connect(m_ui.submit_changes, &QToolButton::clicked, [this] {
             if(m_transactions->submitAll()) {
                 clear_pending_changes();
+                // Note: Submitting the changes causes the view to be refreshed, after
+                //  which no row will be selected. This means the delete_transaction
+                //  button should be greyed out
                 m_ui.delete_transaction->setEnabled(false);
             } else {
                 auto error_msg = m_transactions->lastError().databaseText();
@@ -107,6 +110,7 @@ struct TransactionsView::Impl {
             m_ui.transactions_view->setRowHidden(row, false);
         }
         m_hidden_rows.clear();
+        m_ui.transactions_view->resizeColumnsToContents();
     }
 
     std::unique_ptr<QSqlRelationalTableModel> m_transactions;
