@@ -1,0 +1,14 @@
+# macOS suppressions
+leak:QCoreTextFontDatabase
+leak:CUIRenderer
+leak:NSColor*
+leak:CA::Layer*
+leak:WindowData::*
+leak:NSCoreTypesetter
+leak:NSTheme*
+leak:NSXPCConnection
+leak:NSCursor
+leak:NSMenuItem
+leak:QCocoaWindow
+leak:NSImage
+leak:QMacStyle
