@@ -63,6 +63,12 @@ TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> tra
         m_impl->mark_dirty();
     });
 
+    connect(m_impl->ui.transactions_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
+        m_impl->ui.delete_transaction_button->setEnabled(
+            m_impl->ui.transactions_view->selectionModel()->hasSelection()
+        );
+    });
+
     connect(m_impl->ui.delete_transaction_button, &QToolButton::clicked, [this] {
         auto selected_items = m_impl->ui.transactions_view->selectionModel()->selectedIndexes();
         // Remove starting from highest index to avoid invalidating indices when deleting
@@ -78,6 +84,7 @@ TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> tra
     connect(m_impl->ui.submit_changes_button, &QToolButton::clicked, [this] {
         if(m_impl->transactions->submitAll()) {
             m_impl->reset_undo_state();
+            m_impl->ui.delete_transaction_button->setEnabled(false);
         } else {
             auto error_msg = m_impl->transactions->lastError().databaseText();
             if(error_msg.isEmpty()) {

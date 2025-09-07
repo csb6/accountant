@@ -62,6 +62,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
        </item>
        <item>
         <widget class="QToolButton" name="delete_transaction_button">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
          <property name="toolTip">
           <string>Delete Transaction</string>
          </property>
