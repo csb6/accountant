@@ -37,7 +37,7 @@ struct TransactionsView::Impl {
         ui.revert_changes_button->setEnabled(true);
     }
 
-    void reset_undo_state()
+    void clear_pending_changes()
     {
         ui.submit_changes_button->setEnabled(false);
         ui.revert_changes_button->setEnabled(false);
@@ -83,7 +83,7 @@ TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> tra
 
     connect(m_impl->ui.submit_changes_button, &QToolButton::clicked, [this] {
         if(m_impl->transactions->submitAll()) {
-            m_impl->reset_undo_state();
+            m_impl->clear_pending_changes();
             m_impl->ui.delete_transaction_button->setEnabled(false);
         } else {
             auto error_msg = m_impl->transactions->lastError().databaseText();
@@ -96,7 +96,7 @@ TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> tra
 
     connect(m_impl->ui.revert_changes_button, &QToolButton::clicked, [this] {
         m_impl->transactions->revertAll();
-        m_impl->reset_undo_state();
+        m_impl->clear_pending_changes();
     });
 
     connect(m_impl->ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
