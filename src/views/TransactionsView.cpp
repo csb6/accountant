@@ -26,86 +26,92 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "ui_transactionsview.h"
 
 struct TransactionsView::Impl {
-    std::unique_ptr<QSqlRelationalTableModel> transactions;
-    QErrorMessage* error_modal;
-    Ui::TransactionsView ui;
-    std::vector<int> hidden_rows;
+    Impl(TransactionsView* owner, std::unique_ptr<QSqlRelationalTableModel> transactions)
+        : m_transactions(std::move(transactions)), m_error_modal(new QErrorMessage(owner))
+    {
+        m_ui.setupUi(owner);
+        m_error_modal->setModal(true);
+        m_ui.transactions_view->setModel(m_transactions.get());
+        m_ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_ui.transactions_view));
+        m_ui.transactions_view->hideColumn(TRANSACTIONS_ID);
+        m_ui.transactions_view->resizeColumnsToContents();
+
+        connect(m_ui.new_transaction_button, &QToolButton::clicked, [this] {
+            m_transactions->insertRow(m_transactions->rowCount());
+            mark_dirty();
+            // Select the new row (will also autoscroll to that row if not visible)
+            m_ui.transactions_view->selectRow(m_transactions->rowCount() - 1);
+        });
+
+        connect(m_ui.transactions_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
+            m_ui.delete_transaction_button->setEnabled(
+                m_ui.transactions_view->selectionModel()->hasSelection()
+            );
+        });
+
+        connect(m_ui.delete_transaction_button, &QToolButton::clicked, [this] {
+            auto selected_items = m_ui.transactions_view->selectionModel()->selectedIndexes();
+            // Remove starting from highest index to avoid invalidating indices when deleting
+            std::ranges::sort(selected_items, std::greater<>());
+            for(auto item : selected_items) {
+                m_ui.transactions_view->hideRow(item.row());
+                m_transactions->removeRow(item.row());
+                m_hidden_rows.push_back(item.row());
+            }
+            mark_dirty();
+        });
+
+        connect(m_ui.submit_changes_button, &QToolButton::clicked, [this] {
+            if(m_transactions->submitAll()) {
+                clear_pending_changes();
+                m_ui.delete_transaction_button->setEnabled(false);
+            } else {
+                auto error_msg = m_transactions->lastError().databaseText();
+                if(error_msg.isEmpty()) {
+                    error_msg = "Failed to submit changes (check that new rows have all fields filled out)";
+                }
+                m_error_modal->showMessage(error_msg);
+            }
+        });
+
+        connect(m_ui.revert_changes_button, &QToolButton::clicked, [this] {
+            m_transactions->revertAll();
+            clear_pending_changes();
+        });
+
+        connect(m_ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
+            // Resize columns whenever a cell is edited (since this could change the width of its column)
+            m_ui.transactions_view->resizeColumnsToContents();
+            m_ui.submit_changes_button->setEnabled(m_transactions->isDirty());
+            m_ui.revert_changes_button->setEnabled(m_transactions->isDirty());
+        });
+    }
 
     void mark_dirty()
     {
-        ui.submit_changes_button->setEnabled(true);
-        ui.revert_changes_button->setEnabled(true);
+        m_ui.submit_changes_button->setEnabled(true);
+        m_ui.revert_changes_button->setEnabled(true);
     }
 
     void clear_pending_changes()
     {
-        ui.submit_changes_button->setEnabled(false);
-        ui.revert_changes_button->setEnabled(false);
-        for(auto row : hidden_rows) {
-            ui.transactions_view->setRowHidden(row, false);
+        m_ui.submit_changes_button->setEnabled(false);
+        m_ui.revert_changes_button->setEnabled(false);
+        for(auto row : m_hidden_rows) {
+            m_ui.transactions_view->setRowHidden(row, false);
         }
-        hidden_rows.clear();
+        m_hidden_rows.clear();
     }
+
+    std::unique_ptr<QSqlRelationalTableModel> m_transactions;
+    QErrorMessage* m_error_modal;
+    Ui::TransactionsView m_ui;
+    std::vector<int> m_hidden_rows;
 };
 
 TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> transactions)
-    : QFrame(), m_impl(new Impl(std::move(transactions), new QErrorMessage(this)))
-{
-    m_impl->ui.setupUi(this);
-    m_impl->error_modal->setModal(true);
-    m_impl->ui.transactions_view->setModel(m_impl->transactions.get());
-    m_impl->ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_impl->ui.transactions_view));
-    m_impl->ui.transactions_view->hideColumn(TRANSACTIONS_ID);
-    m_impl->ui.transactions_view->resizeColumnsToContents();
-
-    connect(m_impl->ui.new_transaction_button, &QToolButton::clicked, [this] {
-        m_impl->transactions->insertRow(m_impl->transactions->rowCount());
-        m_impl->mark_dirty();
-    });
-
-    connect(m_impl->ui.transactions_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
-        m_impl->ui.delete_transaction_button->setEnabled(
-            m_impl->ui.transactions_view->selectionModel()->hasSelection()
-        );
-    });
-
-    connect(m_impl->ui.delete_transaction_button, &QToolButton::clicked, [this] {
-        auto selected_items = m_impl->ui.transactions_view->selectionModel()->selectedIndexes();
-        // Remove starting from highest index to avoid invalidating indices when deleting
-        std::ranges::sort(selected_items, std::greater<>());
-        for(auto item : selected_items) {
-            m_impl->ui.transactions_view->hideRow(item.row());
-            m_impl->transactions->removeRow(item.row());
-            m_impl->hidden_rows.push_back(item.row());
-        }
-        m_impl->mark_dirty();
-    });
-
-    connect(m_impl->ui.submit_changes_button, &QToolButton::clicked, [this] {
-        if(m_impl->transactions->submitAll()) {
-            m_impl->clear_pending_changes();
-            m_impl->ui.delete_transaction_button->setEnabled(false);
-        } else {
-            auto error_msg = m_impl->transactions->lastError().databaseText();
-            if(error_msg.isEmpty()) {
-                error_msg = "Failed to submit changes (check that new rows have all fields filled out)";
-            }
-            m_impl->error_modal->showMessage(error_msg);
-        }
-    });
-
-    connect(m_impl->ui.revert_changes_button, &QToolButton::clicked, [this] {
-        m_impl->transactions->revertAll();
-        m_impl->clear_pending_changes();
-    });
-
-    connect(m_impl->ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
-        // Resize columns whenever a cell is edited (since this could change the width of its column)
-        m_impl->ui.transactions_view->resizeColumnsToContents();
-        m_impl->ui.submit_changes_button->setEnabled(m_impl->transactions->isDirty());
-        m_impl->ui.revert_changes_button->setEnabled(m_impl->transactions->isDirty());
-    });
-}
+    : QFrame(), m_impl(new Impl(this, std::move(transactions)))
+{}
 
 TransactionsView::~TransactionsView() noexcept
 {
