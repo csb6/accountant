@@ -32,7 +32,6 @@ struct TransactionsView::Impl {
         m_ui.setupUi(owner);
         m_error_modal->setModal(true);
         m_ui.transactions_view->setModel(m_transactions.get());
-        m_ui.transactions_view->setItemDelegate(new QSqlRelationalDelegate(m_ui.transactions_view));
         m_ui.transactions_view->hideColumn(TRANSACTIONS_ID);
         m_ui.transactions_view->resizeColumnsToContents();
 
@@ -79,12 +78,19 @@ struct TransactionsView::Impl {
             clear_pending_changes();
         });
 
-        connect(m_ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
-            // Resize columns whenever a cell is edited (since this could change the width of its column)
+        auto* relational_delegate = new QSqlRelationalDelegate(m_ui.transactions_view);
+        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_SOURCE, relational_delegate);
+        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_DESTINATION, relational_delegate);
+
+        auto resize_columns = [this] {
             m_ui.transactions_view->resizeColumnsToContents();
             m_ui.submit_changes->setEnabled(m_transactions->isDirty());
             m_ui.revert_changes->setEnabled(m_transactions->isDirty());
-        });
+        };
+
+        // Resize columns whenever a cell is edited (since this could change the width of its column)
+        connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, resize_columns);
+        connect(relational_delegate, &QSqlRelationalDelegate::commitData, resize_columns);
     }
 
     void mark_dirty()
