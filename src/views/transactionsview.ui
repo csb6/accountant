@@ -46,9 +46,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout">
+      <layout class="QHBoxLayout" name="toolbar">
        <item>
-        <widget class="QToolButton" name="new_transaction_button">
+        <widget class="QToolButton" name="new_transaction">
          <property name="toolTip">
           <string>New Transaction</string>
          </property>
@@ -61,7 +61,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="delete_transaction_button">
+        <widget class="QToolButton" name="delete_transaction">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -77,7 +77,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="submit_changes_button">
+        <widget class="QToolButton" name="submit_changes">
          <property name="enabled">
           <bool>false</bool>
          </property>
@@ -87,7 +87,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="revert_changes_button">
+        <widget class="QToolButton" name="revert_changes">
          <property name="enabled">
           <bool>false</bool>
          </property>

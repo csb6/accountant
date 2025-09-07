@@ -36,7 +36,7 @@ struct TransactionsView::Impl {
         m_ui.transactions_view->hideColumn(TRANSACTIONS_ID);
         m_ui.transactions_view->resizeColumnsToContents();
 
-        connect(m_ui.new_transaction_button, &QToolButton::clicked, [this] {
+        connect(m_ui.new_transaction, &QToolButton::clicked, [this] {
             m_transactions->insertRow(m_transactions->rowCount());
             mark_dirty();
             // Select the new row (will also autoscroll to that row if not visible)
@@ -44,12 +44,12 @@ struct TransactionsView::Impl {
         });
 
         connect(m_ui.transactions_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
-            m_ui.delete_transaction_button->setEnabled(
+            m_ui.delete_transaction->setEnabled(
                 m_ui.transactions_view->selectionModel()->hasSelection()
             );
         });
 
-        connect(m_ui.delete_transaction_button, &QToolButton::clicked, [this] {
+        connect(m_ui.delete_transaction, &QToolButton::clicked, [this] {
             auto selected_items = m_ui.transactions_view->selectionModel()->selectedIndexes();
             // Remove starting from highest index to avoid invalidating indices when deleting
             std::ranges::sort(selected_items, std::greater<>());
@@ -61,10 +61,10 @@ struct TransactionsView::Impl {
             mark_dirty();
         });
 
-        connect(m_ui.submit_changes_button, &QToolButton::clicked, [this] {
+        connect(m_ui.submit_changes, &QToolButton::clicked, [this] {
             if(m_transactions->submitAll()) {
                 clear_pending_changes();
-                m_ui.delete_transaction_button->setEnabled(false);
+                m_ui.delete_transaction->setEnabled(false);
             } else {
                 auto error_msg = m_transactions->lastError().databaseText();
                 if(error_msg.isEmpty()) {
@@ -74,7 +74,7 @@ struct TransactionsView::Impl {
             }
         });
 
-        connect(m_ui.revert_changes_button, &QToolButton::clicked, [this] {
+        connect(m_ui.revert_changes, &QToolButton::clicked, [this] {
             m_transactions->revertAll();
             clear_pending_changes();
         });
@@ -82,21 +82,21 @@ struct TransactionsView::Impl {
         connect(m_ui.transactions_view->itemDelegate(), &QSqlRelationalDelegate::commitData, [this] {
             // Resize columns whenever a cell is edited (since this could change the width of its column)
             m_ui.transactions_view->resizeColumnsToContents();
-            m_ui.submit_changes_button->setEnabled(m_transactions->isDirty());
-            m_ui.revert_changes_button->setEnabled(m_transactions->isDirty());
+            m_ui.submit_changes->setEnabled(m_transactions->isDirty());
+            m_ui.revert_changes->setEnabled(m_transactions->isDirty());
         });
     }
 
     void mark_dirty()
     {
-        m_ui.submit_changes_button->setEnabled(true);
-        m_ui.revert_changes_button->setEnabled(true);
+        m_ui.submit_changes->setEnabled(true);
+        m_ui.revert_changes->setEnabled(true);
     }
 
     void clear_pending_changes()
     {
-        m_ui.submit_changes_button->setEnabled(false);
-        m_ui.revert_changes_button->setEnabled(false);
+        m_ui.submit_changes->setEnabled(false);
+        m_ui.revert_changes->setEnabled(false);
         for(auto row : m_hidden_rows) {
             m_ui.transactions_view->setRowHidden(row, false);
         }
