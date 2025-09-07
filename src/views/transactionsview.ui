@@ -49,15 +49,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
         <widget class="QToolButton" name="new_transaction_button">
+         <property name="toolTip">
+          <string>New Transaction</string>
+         </property>
          <property name="text">
           <string>New Transaction</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::ListAdd"/>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QToolButton" name="delete_transaction_button">
+         <property name="toolTip">
+          <string>Delete Transaction</string>
+         </property>
          <property name="text">
           <string>Delete Transaction</string>
+         </property>
+         <property name="icon">
+          <iconset theme="QIcon::ThemeIcon::ListRemove"/>
          </property>
         </widget>
        </item>
