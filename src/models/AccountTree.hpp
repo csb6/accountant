@@ -34,6 +34,8 @@ public:
     ~AccountTree() noexcept;
 
     std::unique_ptr<AccountTransactions> account_transactions(QModelIndex);
+public slots:
+    void refresh();
 private:
     struct Impl;
     Impl* m_impl;

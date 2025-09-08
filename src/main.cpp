@@ -17,17 +17,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include <iostream>
-#include <string>
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QSqlDatabase>
-#include <QSqlQueryModel>
 #include <QString>
-#include "util/sql_helpers.hpp"
 #include "models/AccountTree.hpp"
+#include "models/DatabaseManager.hpp"
 #include "views/MainWindow.hpp"
-
-static constexpr int latest_schema_version = 1;
 
 int main(int argc, char* argv[])
 {
@@ -44,17 +39,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    auto db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName(args[0]);
-    if(!db.open()) {
-        std::cerr << "Error: could not open accounts database\n";
-        return 1;
-    }
-    sql_helpers::upgrade_schema_if_needed(db, latest_schema_version, "schemas");
-    sql_helpers::exec_query(db, "pragma foreign_keys = ON");
-
-    AccountTree account_tree{db};
+    auto database_path = args[0];
+    DatabaseManager db_manager{database_path};
+    AccountTree account_tree{db_manager.database()};
     MainWindow main_window{account_tree};
+    QObject::connect(&main_window, &MainWindow::database_changed, &db_manager, &DatabaseManager::load_database);
+    QObject::connect(&db_manager, &DatabaseManager::database_loaded, &account_tree, &AccountTree::refresh);
+
     main_window.show();
     return app.exec();
 }

@@ -100,8 +100,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
      <height>24</height>
     </rect>
    </property>
+   <widget class="QMenu" name="file_menu">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="file_open"/>
+   </widget>
+   <addaction name="file_menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="file_open">
+   <property name="text">
+    <string>Open...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

@@ -17,56 +17,84 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "MainWindow.hpp"
+#include <cassert>
+#include <QFileDialog>
 #include "models/AccountTree.hpp"
+#include "models/Roles.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
-#include "models/Roles.hpp"
 
-MainWindow::MainWindow(AccountTree& account_tree)
-    : QMainWindow(), ui(new Ui::MainWindow)
-{
-    ui->setupUi(this);
-    ui->account_tree_view->setModel(&account_tree);
-    auto* tab_bar = ui->tabs->tabBar();
-    // Accounts tab cannot be closed
-    tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
-    tab_bar->setTabButton(0, QTabBar::ButtonPosition::LeftSide, nullptr);
-
-    connect(ui->account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
-    connect(ui->tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
-        auto* tab = ui->tabs->widget(tab_index);
-        ui->tabs->removeTab(tab_index);
+struct MainWindow::Impl {
+    void close_tab(int tab_index)
+    {
+        auto* tab = ui.tabs->widget(tab_index);
+        ui.tabs->removeTab(tab_index);
         // Needed since removeTab doesn't delete the object, and tab would otherwise stick around
-        // until ui->tabs is destroyed. Since ui->tabs is only destroyed at program close and
+        // until ui.tabs is destroyed. Since ui.tabs is only destroyed at program close and
         // tabs are opened/closed frequently, this would effectively be a memory leak. To avoid this,
         // we delete it right away.
         tab->setParent(nullptr);
         delete tab;
+    }
+
+    void close_all_transaction_tabs()
+    {
+        for(int i = ui.tabs->count() - 1; i > 0; --i) {
+            close_tab(i);
+        }
+    }
+
+    QFileDialog* file_dialog;
+    Ui::MainWindow ui;
+};
+
+MainWindow::MainWindow(AccountTree& account_tree)
+    : QMainWindow(), m_impl(new Impl(new QFileDialog(this)))
+{
+    m_impl->ui.setupUi(this);
+    m_impl->file_dialog->setNameFilter("*.db");
+
+    m_impl->ui.account_tree_view->setModel(&account_tree);
+    connect(m_impl->ui.account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
+    connect(m_impl->ui.file_open, &QAction::triggered, m_impl->file_dialog, &QDialog::open);
+    connect(m_impl->file_dialog, &QDialog::accepted, [this] {
+        auto files = m_impl->file_dialog->selectedFiles();
+        assert(files.size() == 1);
+        m_impl->close_all_transaction_tabs();
+        emit database_changed(files[0]);
+    });
+
+    auto* tab_bar = m_impl->ui.tabs->tabBar();
+    // Accounts tab cannot be closed
+    tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
+    tab_bar->setTabButton(0, QTabBar::ButtonPosition::LeftSide, nullptr);
+    connect(m_impl->ui.tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
+        m_impl->close_tab(tab_index);
     });
 }
 
 MainWindow::~MainWindow() noexcept
 {
-    delete ui;
+    delete m_impl;
 }
 
 void MainWindow::open_transactions_view(QModelIndex account)
 {
     auto tab_name = account.data(Account_Path_Role).toString();
     // Don't add new tab if already open
-    for(int i = 0; i < ui->tabs->count(); ++i) {
-        if(ui->tabs->tabText(i) == tab_name) {
-            ui->tabs->setCurrentIndex(i);
+    for(int i = 0; i < m_impl->ui.tabs->count(); ++i) {
+        if(m_impl->ui.tabs->tabText(i) == tab_name) {
+            m_impl->ui.tabs->setCurrentIndex(i);
             return;
         }
     }
-    auto* account_tree = static_cast<AccountTree*>(ui->account_tree_view->model());
+    auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
     auto account_transactions = account_tree->account_transactions(account);
     if(!account_transactions) {
         return;
     }
     auto* transactions_view = new TransactionsView(std::move(account_transactions));
-    auto tab_index = ui->tabs->addTab(transactions_view, tab_name);
-    ui->tabs->setTabToolTip(tab_index, tab_name);
-    ui->tabs->setCurrentIndex(tab_index);
+    auto tab_index = m_impl->ui.tabs->addTab(transactions_view, tab_name);
+    m_impl->ui.tabs->setTabToolTip(tab_index, tab_name);
+    m_impl->ui.tabs->setCurrentIndex(tab_index);
 }

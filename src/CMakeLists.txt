@@ -16,6 +16,7 @@ qt_add_executable(accountant
     views/transactionsview.ui views/TransactionsView.cpp
     models/AccountTree.cpp
     models/AccountTransactions.cpp
+    models/DatabaseManager.cpp
     util/sql_helpers.cpp)
 target_include_directories(accountant PUBLIC .)
 target_compile_features(accountant PUBLIC cxx_std_20)

@@ -61,6 +61,13 @@ std::unique_ptr<AccountTransactions> AccountTree::account_transactions(QModelInd
     return std::make_unique<AccountTransactions>(*m_impl->db, account_id);
 }
 
+void AccountTree::refresh()
+{
+    m_impl->query_model.refresh();
+    clear();
+    build_tree(m_impl->query_model, invisibleRootItem());
+}
+
 static
 void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
 {

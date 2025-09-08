@@ -20,10 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include <QMainWindow>
 
-namespace Ui {
-    class MainWindow;
-}
-
 class AccountTree;
 
 class MainWindow : public QMainWindow {
@@ -32,8 +28,11 @@ public:
     explicit
     MainWindow(AccountTree&);
     ~MainWindow() noexcept;
+signals:
+    void database_changed(QString database_path);
 private slots:
     void open_transactions_view(QModelIndex account);
 private:
-    Ui::MainWindow* ui;
+    struct Impl;
+    Impl* m_impl;
 };
