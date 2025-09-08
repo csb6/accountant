@@ -21,8 +21,11 @@ target_include_directories(accountant PUBLIC .)
 target_compile_features(accountant PUBLIC cxx_std_20)
 target_link_libraries(accountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 
-add_custom_target(run_with_asan
-    "ASAN_OPTIONS=detect_leaks=1" "LSAN_OPTIONS=suppressions=${LEAK_SUPPR_FILE}"
-    ${CMAKE_CURRENT_BINARY_DIR}/accountant accounts.db
-    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-)
+if(WITH_ASAN)
+    add_custom_target(run_with_asan
+        "ASAN_OPTIONS=detect_leaks=1" "LSAN_OPTIONS=suppressions=${LEAK_SUPPR_FILE}"
+        ${CMAKE_CURRENT_BINARY_DIR}/accountant accounts.db
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        DEPENDS accountant
+    )
+endif()
