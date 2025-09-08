@@ -36,7 +36,11 @@ MainWindow::MainWindow(AccountTree& account_tree)
     connect(ui->tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
         auto* tab = ui->tabs->widget(tab_index);
         ui->tabs->removeTab(tab_index);
-        // Needed since removeTab doesn't delete the object
+        // Needed since removeTab doesn't delete the object, and tab would otherwise stick around
+        // until ui->tabs is destroyed. Since ui->tabs is only destroyed at program close and
+        // tabs are opened/closed frequently, this would effectively be a memory leak. To avoid this,
+        // we delete it right away.
+        tab->setParent(nullptr);
         delete tab;
     });
 }
