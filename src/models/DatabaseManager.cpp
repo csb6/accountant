@@ -42,7 +42,7 @@ void DatabaseManager::load_database(QString database_path)
             // For some reason, Qt does not check if the SQLite database that it opened is actually
             // a valid database file, so we do not find out until attempting to execute the first
             // query (which will then throw an exception)
-            error_message = err.what();
+            error_message = QString("Failed to read '%1'\n(Reason: %2)").arg(database_path, err.what());
         }
     }
 
