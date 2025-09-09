@@ -19,6 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <iostream>
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QErrorMessage>
+#include <QOverload>
 #include <QString>
 #include "models/AccountTree.hpp"
 #include "models/DatabaseManager.hpp"
@@ -40,7 +42,11 @@ int main(int argc, char* argv[])
     }
 
     auto database_path = args[0];
-    DatabaseManager db_manager{database_path};
+    QErrorMessage error_dialog;
+    DatabaseManager db_manager;
+    QObject::connect(&db_manager, &DatabaseManager::failed_to_load_database,
+                     &error_dialog, qOverload<const QString&>(&QErrorMessage::showMessage));
+    db_manager.load_database(database_path);
     AccountTree account_tree{db_manager.database()};
     MainWindow main_window{account_tree};
     QObject::connect(&main_window, &MainWindow::database_changed, &db_manager, &DatabaseManager::load_database);

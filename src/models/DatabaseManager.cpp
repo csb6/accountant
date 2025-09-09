@@ -1,22 +1,19 @@
 #include "DatabaseManager.hpp"
 #include <exception>
-#include <QErrorMessage>
+#include <optional>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include "util/sql_helpers.hpp"
 
 struct DatabaseManager::Impl {
     QSqlDatabase db;
-    QErrorMessage error_dialog;
 };
 
 static constexpr int latest_schema_version = 1;
 
-DatabaseManager::DatabaseManager(QString database_path)
+DatabaseManager::DatabaseManager()
     : m_impl(new Impl(QSqlDatabase::addDatabase("QSQLITE")))
-{
-    load_database(database_path);
-}
+{}
 
 DatabaseManager::~DatabaseManager() noexcept
 {}
@@ -33,23 +30,27 @@ void DatabaseManager::load_database(QString database_path)
         m_impl->db.close();
     }
     m_impl->db.setDatabaseName(database_path);
+    std::optional<QString> error_message;
     if(!m_impl->db.open()) {
-        QString error_message = m_impl->db.lastError().databaseText();
-        if(error_message.isEmpty()) {
+        error_message = m_impl->db.lastError().databaseText();
+        if(error_message->isEmpty()) {
             error_message = "Failed to open accounts database";
         }
-        m_impl->error_dialog.showMessage(error_message);
-        return;
+    } else {
+        try {
+            sql_helpers::upgrade_schema_if_needed(m_impl->db, latest_schema_version, "schemas");
+            sql_helpers::exec_query(m_impl->db, "pragma foreign_keys = ON");
+        } catch(const std::exception& err) {
+            // For some reason, Qt does not check if the SQLite database that it opened is actually
+            // a valid database file, so we do not find out until attempting to execute the first
+            // query (which will then throw an exception)
+            error_message = err.what();
+        }
     }
-    try {
-        sql_helpers::upgrade_schema_if_needed(m_impl->db, latest_schema_version, "schemas");
-        sql_helpers::exec_query(m_impl->db, "pragma foreign_keys = ON");
-    } catch(const std::exception&) {
-        // For some reason, Qt does not check if the SQLite database that it opened is actually
-        // a valid database file, so we do not find out until attempting to execute the first
-        // query (which will then throw an exception)
-        m_impl->error_dialog.showMessage("Failed to read accounts database");
-        return;
+
+    if(error_message.has_value()) {
+        emit failed_to_load_database(*error_message);
+    } else {
+        emit database_loaded();
     }
-    emit database_loaded();
 }
