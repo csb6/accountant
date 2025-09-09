@@ -35,7 +35,8 @@ public:
 
     std::unique_ptr<AccountTransactions> account_transactions(QModelIndex);
 public slots:
-    void refresh();
+    void reset();
+    void load();
 private:
     struct Impl;
     Impl* m_impl;

@@ -14,6 +14,7 @@ public:
     ~DatabaseManager() noexcept;
     QSqlDatabase& database();
 signals:
+    void database_closing();
     void database_loaded();
     void failed_to_load_database(QString error_message);
 public slots:

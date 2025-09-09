@@ -60,8 +60,9 @@ MainWindow::MainWindow(AccountTree& account_tree)
     connect(m_impl->file_dialog, &QDialog::accepted, [this] {
         auto files = m_impl->file_dialog->selectedFiles();
         assert(files.size() == 1);
-        m_impl->close_all_transaction_tabs();
-        emit database_changed(files[0]);
+        if(files.size() == 1) {
+            emit database_changed(files[0]);
+        }
     });
 
     auto* tab_bar = m_impl->ui.tabs->tabBar();
@@ -76,6 +77,11 @@ MainWindow::MainWindow(AccountTree& account_tree)
 MainWindow::~MainWindow() noexcept
 {
     delete m_impl;
+}
+
+void MainWindow::reset()
+{
+    m_impl->close_all_transaction_tabs();
 }
 
 void MainWindow::open_transactions_view(QModelIndex account)

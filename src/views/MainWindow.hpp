@@ -30,6 +30,8 @@ public:
     ~MainWindow() noexcept;
 signals:
     void database_changed(QString database_path);
+public slots:
+    void reset();
 private slots:
     void open_transactions_view(QModelIndex account);
 private:

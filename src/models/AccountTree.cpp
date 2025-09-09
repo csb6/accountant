@@ -41,8 +41,7 @@ void build_tree(QSqlQueryModel&, QStandardItem* root);
 AccountTree::AccountTree(QSqlDatabase& db)
     : QStandardItemModel(), m_impl(new Impl{&db})
 {
-    m_impl->query_model.setQuery("select id, name from accounts order by name", db);
-    build_tree(m_impl->query_model, invisibleRootItem());
+    load();
 }
 
 AccountTree::~AccountTree() noexcept
@@ -61,9 +60,17 @@ std::unique_ptr<AccountTransactions> AccountTree::account_transactions(QModelInd
     return std::make_unique<AccountTransactions>(*m_impl->db, account_id);
 }
 
-void AccountTree::refresh()
+void AccountTree::reset()
 {
-    m_impl->query_model.refresh();
+    // Cleans up any query if active so database can be safely closed
+    m_impl->query_model.clear();
+    clear();
+}
+
+void AccountTree::load()
+{
+    // Database may have changed, so rebuild the query
+    m_impl->query_model.setQuery("select id, name from accounts order by name", *m_impl->db);
     clear();
     build_tree(m_impl->query_model, invisibleRootItem());
 }
