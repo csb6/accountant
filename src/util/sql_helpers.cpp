@@ -17,11 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "sql_helpers.hpp"
-#include <filesystem>
-#include <format>
-#include <fstream>
-#include <ios>
 #include <stdexcept>
+#include <QDir>
+#include <QFile>
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QString>
@@ -35,21 +33,18 @@ void try_(QSqlQuery& query, bool status)
     }
 }
 
-QSqlQuery exec_query(QSqlDatabase& db, const std::string& query_text)
+QSqlQuery exec_query(QSqlDatabase& db, QString query_text)
 {
     QSqlQuery query{db};
-    try_(query, query.exec(QString::fromStdString(query_text)));
+    try_(query, query.exec(query_text));
     return query;
 }
 
-void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, const std::string& schema_dir_path)
+void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QString schema_dir_path)
 {
-    std::filesystem::path schema_folder{schema_dir_path};
-    if(!std::filesystem::exists(schema_dir_path)) {
+    QDir schema_folder{schema_dir_path};
+    if(!schema_folder.exists()) {
         throw std::runtime_error("Schema folder path does not exist");
-    }
-    if(!std::filesystem::is_directory(schema_dir_path)) {
-        throw std::runtime_error("Schema folder path is not a directory");
     }
 
     auto query = exec_query(db, "pragma user_version");
@@ -62,20 +57,21 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, const
         for(auto v = schema_version + 1; v <= latest_schema_version; ++v) {
             try {
                 db.transaction();
-                auto schema_path = schema_folder / std::format("{}-schema.sql", v);
-                std::ifstream schema_file{schema_path};
-                if(!schema_file) {
-                    throw std::runtime_error(std::format("Schema migration failed - missing file: '{}'", schema_path.filename().string()));
+                auto schema_filename = QString("%1-schema.sql").arg(v);
+                auto schema_path = schema_folder.filePath(schema_filename);
+                QFile schema_file{schema_path};
+                if(!schema_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                    throw std::runtime_error(QString("Schema migration failed - missing file: '%1'").arg(schema_filename).toStdString());
                 }
-                std::noskipws(schema_file);
-                std::string command;
+                QString command;
                 // Each command must be on a single line
-                while(std::getline(schema_file, command)) {
-                    if(!command.empty() && !command.starts_with("--")) {
+                while(!schema_file.atEnd()) {
+                    QString command = schema_file.readLine();
+                    if(!command.isEmpty() && !command.startsWith("--")) {
                         exec_query(db, command);
                     }
                 }
-                exec_query(db, std::format("pragma user_version = {}", latest_schema_version));
+                exec_query(db, QString("pragma user_version = %1").arg(latest_schema_version));
                 db.commit();
             } catch(const std::exception&) {
                 db.rollback();
