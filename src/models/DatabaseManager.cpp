@@ -26,7 +26,8 @@ QSqlDatabase& DatabaseManager::database()
 
 void DatabaseManager::load_database(QString database_path)
 {
-    auto standby_db = QSqlDatabase::addDatabase("QSQLITE", QString::number(m_impl->db_gen++));
+    auto db_name = QString::number(m_impl->db_gen++);
+    auto standby_db = QSqlDatabase::addDatabase("QSQLITE", db_name);
     standby_db.setDatabaseName(database_path);
     std::optional<QString> error_message;
     if(!standby_db.open()) {
@@ -47,17 +48,18 @@ void DatabaseManager::load_database(QString database_path)
     }
 
     if(error_message.has_value()) {
-        standby_db.close();
-        QSqlDatabase::removeDatabase(standby_db.connectionName());
+        standby_db = {};
+        QSqlDatabase::removeDatabase(db_name);
         emit failed_to_load_database(*error_message);
     } else {
         if(m_impl->db.isOpen()) {
+            auto old_db_name = m_impl->db.connectionName();
             // Notify models so that they can close their queries
             emit database_closing();
-            m_impl->db.close();
-            QSqlDatabase::removeDatabase(m_impl->db.connectionName());
+            m_impl->db = {};
+            QSqlDatabase::removeDatabase(old_db_name);
         }
-        m_impl->db = QSqlDatabase::database(standby_db.connectionName());
+        m_impl->db = standby_db;
         emit database_loaded();
     }
 }
