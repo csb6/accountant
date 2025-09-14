@@ -51,7 +51,7 @@ struct TransactionsView::Impl {
         connect(m_ui.delete_transaction, &QToolButton::clicked, [this] {
             auto selected_items = m_ui.transactions_view->selectionModel()->selectedIndexes();
             // Remove starting from highest index to avoid invalidating indices when deleting
-            std::ranges::sort(selected_items, std::greater<>());
+            std::ranges::sort(selected_items, [](const auto& a, const auto& b) { return a.row() > b.row(); });
             for(auto item : selected_items) {
                 m_ui.transactions_view->hideRow(item.row());
                 m_transactions->removeRow(item.row());

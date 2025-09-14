@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QErrorMessage>
-#include <QOverload>
+#include <qglobal.h>
 #include <QString>
 #include "models/AccountTree.hpp"
 #include "models/DatabaseManager.hpp"
