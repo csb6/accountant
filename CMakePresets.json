@@ -13,6 +13,13 @@
                 "CMAKE_CXX_EXTENSIONS": false
             },
             "binaryDir": "build"
+        },
+        {
+            "name": "Debug",
+            "inherits": ["default"],
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
         }
     ]
 }
