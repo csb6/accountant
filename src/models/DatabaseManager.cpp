@@ -23,7 +23,9 @@ DatabaseManager::DatabaseManager()
 {}
 
 DatabaseManager::~DatabaseManager() noexcept
-{}
+{
+    delete m_impl;
+}
 
 QSqlDatabase& DatabaseManager::database()
 {
