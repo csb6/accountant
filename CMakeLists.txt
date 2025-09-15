@@ -12,4 +12,10 @@ if(WITH_ASAN)
     string(APPEND CMAKE_CXX_FLAGS " -fsanitize=address")
 endif()
 
+option(SQL_QUERY_LOGGING "Log text of queries as they are sent to SQLite" OFF)
+if(SQL_QUERY_LOGGING)
+    message(NOTICE "NOTE: The installation of SQLite being used MUST be the same as the installation used by Qt's SQlite plugin")
+    find_package(SQLite3 REQUIRED)
+endif()
+
 add_subdirectory(src)

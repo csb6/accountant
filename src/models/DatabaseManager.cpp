@@ -4,6 +4,12 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include "util/sql_helpers.hpp"
+#ifdef SQL_QUERY_LOGGING
+#include <cstring>
+#include <iostream>
+#include <QSqlDriver>
+#include <sqlite3.h>
+#endif
 
 struct DatabaseManager::Impl {
     QSqlDatabase db;
@@ -60,6 +66,21 @@ void DatabaseManager::load_database(QString database_path)
             QSqlDatabase::removeDatabase(old_db_name);
         }
         m_impl->db = standby_db;
+        #ifdef SQL_QUERY_LOGGING
+            auto v = m_impl->db.driver()->handle();
+            if(v.isValid() && strcmp(v.typeName(), "sqlite3*") == 0) {
+                auto* sqlite_handle = *static_cast<sqlite3**>(v.data());
+                if(sqlite_handle) {
+                    sqlite3_trace_v2(sqlite_handle, SQLITE_TRACE_STMT, [](unsigned, void*, void* p, void*) {
+                        auto* stmt = static_cast<sqlite3_stmt*>(p);
+                        auto* stmt_text = sqlite3_expanded_sql(stmt);
+                        std::cerr << "SQLITE: " << stmt_text << "\n";
+                        sqlite3_free(stmt_text);
+                        return 0;
+                    }, nullptr);
+                }
+            }
+        #endif
         emit database_loaded();
     }
 }
