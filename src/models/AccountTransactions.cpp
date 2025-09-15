@@ -18,49 +18,50 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "AccountTransactions.hpp"
 #include <QDate>
+#include <QString>
 #include "SQLColumns.hpp"
 
 AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
-    : QSqlRelationalTableModel(nullptr, db)
+    : QSqlTableModel(nullptr, db)
 {
-    setTable("transactions");
-    setRelation(TRANSACTIONS_SOURCE, QSqlRelation{"accounts", "id", "name"});
-    setHeaderData(TRANSACTIONS_SOURCE, Qt::Horizontal, "source");
-    setRelation(TRANSACTIONS_DESTINATION, QSqlRelation{"accounts", "id", "name"});
-    setHeaderData(TRANSACTIONS_DESTINATION, Qt::Horizontal, "destination");
+    setTable("transactions_view");
+    const QString column_names[] = {
+        "ID",
+        "Date",
+        "Description",
+        "Source",
+        "Destination",
+        "Unit Price",
+        "Quantity",
+        "Amount"
+    };
+    static_assert(std::size(column_names) == TRANSACTIONS_VIEW_COL_COUNT);
+    int column_num = 0;
+    for(const auto& name : column_names) {
+        setHeaderData(column_num++, Qt::Horizontal, name);
+    }
+
     setFilter(QString("source = %1 or destination = %1").arg(account_id));
     // Note: can't use OnItemChange because that causes the foreign keys to be exposed
     //  when editing (instead of the human-readable names those keys are mapped to)
     setEditStrategy(EditStrategy::OnManualSubmit);
-    setSort(TRANSACTIONS_DATE, Qt::SortOrder::AscendingOrder);
+    setSort(TRANSACTIONS_VIEW_DATE, Qt::SortOrder::AscendingOrder);
 
     select();
 }
 
-QVariant AccountTransactions::headerData(int section, Qt::Orientation orientation, int role) const
-{
-    auto header_data = QSqlRelationalTableModel::headerData(section, orientation, role);
-    if(orientation == Qt::Orientation::Horizontal && role == Qt::DisplayRole) {
-        auto col_name = header_data.toString();
-        if(!col_name.isEmpty()) {
-            // Capitalize first letter of each column name
-            col_name[0] = col_name[0].toUpper();
-        }
-        header_data = col_name;
-    }
-    return header_data;
-}
-
 QVariant AccountTransactions::data(const QModelIndex& index, int role) const
 {
-    auto data = QSqlRelationalTableModel::data(index, role);
+    auto data = QSqlTableModel::data(index, role);
     if(role == Qt::DisplayRole || role == Qt::EditRole) {
         switch(index.column()) {
-            case TRANSACTIONS_DATE:
+            case TRANSACTIONS_VIEW_DATE:
                 data = QDate::fromString(data.toString(), Qt::ISODate);
                 break;
-            case TRANSACTIONS_AMOUNT:
-                data = data.toUInt();
+            case TRANSACTIONS_VIEW_AMOUNT:
+                if(!data.isNull()) {
+                    data = data.toDouble();
+                }
                 break;
             default:
                 break;

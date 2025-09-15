@@ -18,14 +18,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <QSqlRelationalTableModel>
-#include <QString>
+#include <QSqlTableModel>
 
-class AccountTransactions : public QSqlRelationalTableModel {
+class AccountTransactions : public QSqlTableModel {
     Q_OBJECT
 public:
     AccountTransactions(QSqlDatabase&, int account_id);
 
-    QVariant headerData(int section, Qt::Orientation, int role) const override;
     QVariant data(const QModelIndex&, int role) const override;
 };

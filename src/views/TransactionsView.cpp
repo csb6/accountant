@@ -21,18 +21,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <vector>
 #include <QErrorMessage>
 #include <QSqlError>
-#include <QSqlRelationalDelegate>
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
 
 struct TransactionsView::Impl {
-    Impl(TransactionsView* owner, std::unique_ptr<QSqlRelationalTableModel> transactions)
+    Impl(TransactionsView* owner, std::unique_ptr<QSqlTableModel> transactions)
         : m_transactions(std::move(transactions)), m_error_modal(new QErrorMessage(owner))
     {
         m_ui.setupUi(owner);
         m_error_modal->setModal(true);
         m_ui.transactions_view->setModel(m_transactions.get());
-        m_ui.transactions_view->hideColumn(TRANSACTIONS_ID);
+        m_ui.transactions_view->hideColumn(TRANSACTIONS_VIEW_ID);
         m_ui.transactions_view->resizeColumnsToContents();
 
         connect(m_ui.new_transaction, &QToolButton::clicked, [this] {
@@ -81,9 +80,8 @@ struct TransactionsView::Impl {
             clear_pending_changes();
         });
 
-        auto* relational_delegate = new QSqlRelationalDelegate(m_ui.transactions_view);
-        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_SOURCE, relational_delegate);
-        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_DESTINATION, relational_delegate);
+        // TODO: have custom delegates that avoid using the generated column name for source/destination and
+        //  only update cells that have actually changed
 
         auto resize_columns = [this] {
             m_ui.transactions_view->resizeColumnsToContents();
@@ -93,7 +91,6 @@ struct TransactionsView::Impl {
 
         // Resize columns whenever a cell is edited (since this could change the width of its column)
         connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, resize_columns);
-        connect(relational_delegate, &QSqlRelationalDelegate::commitData, resize_columns);
     }
 
     void mark_dirty()
@@ -113,13 +110,13 @@ struct TransactionsView::Impl {
         m_ui.transactions_view->resizeColumnsToContents();
     }
 
-    std::unique_ptr<QSqlRelationalTableModel> m_transactions;
+    std::unique_ptr<QSqlTableModel> m_transactions;
     QErrorMessage* m_error_modal;
     Ui::TransactionsView m_ui;
     std::vector<int> m_hidden_rows;
 };
 
-TransactionsView::TransactionsView(std::unique_ptr<QSqlRelationalTableModel> transactions)
+TransactionsView::TransactionsView(std::unique_ptr<QSqlTableModel> transactions)
     : QFrame(), m_impl(new Impl(this, std::move(transactions)))
 {}
 
