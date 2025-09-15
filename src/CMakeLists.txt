@@ -26,12 +26,3 @@ if(SQL_QUERY_LOGGING)
     target_compile_definitions(accountant PRIVATE SQL_QUERY_LOGGING)
     target_link_libraries(accountant PUBLIC SQLite::SQLite3)
 endif()
-
-if(WITH_ASAN)
-    add_custom_target(run_with_asan
-        "ASAN_OPTIONS=detect_leaks=1" "LSAN_OPTIONS=suppressions=${LEAK_SUPPR_FILE}"
-        ${CMAKE_CURRENT_BINARY_DIR}/accountant accounts.db
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-        DEPENDS accountant
-    )
-endif()
