@@ -6,8 +6,7 @@
     },
     "configurePresets": [
         {
-            "name": "default",
-            "hidden": true,
+            "name": "Default",
             "cacheVariables": {
                 "CMAKE_EXPORT_COMPILE_COMMANDS": true,
                 "CMAKE_CXX_EXTENSIONS": false
@@ -15,10 +14,29 @@
             "binaryDir": "build"
         },
         {
-            "name": "Debug",
-            "inherits": ["default"],
+            "name": "macOS",
+            "description": "macOS toolchain using Homebrew",
+            "inherits": ["Default"],
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_PREFIX_PATH": "/opt/homebrew;/usr/local/opt;/usr/local;$env{SDKROOT};$env{SDKROOT}/System/Library/Frameworks/",
+                "CMAKE_FIND_USE_CMAKE_SYSTEM_PATH": false,
+                "CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH": false
+            }
+        },
+        {
+            "name": "macOS-Clang",
+            "inherits": ["macOS"],
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "/usr/local/opt/llvm/bin/clang++"
+            },
+            "environment": {
+                "CXXFLAGS": "$penv{CXXFLAGS} -pedantic-errors -Wall -Wextra"
             }
         }
     ]
