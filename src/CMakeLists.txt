@@ -11,6 +11,7 @@ endif()
 qt_standard_project_setup()
 
 qt_add_executable(accountant
+    MACOSX_BUNDLE
     main.cpp
     views/mainwindow.ui views/MainWindow.cpp
     views/transactionsview.ui views/TransactionsView.cpp
@@ -25,4 +26,16 @@ target_link_libraries(accountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 if(SQL_QUERY_LOGGING)
     target_compile_definitions(accountant PRIVATE SQL_QUERY_LOGGING)
     target_link_libraries(accountant PUBLIC SQLite::SQLite3)
+endif()
+
+if(APPLE)
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt)
+    # Fixup the .app bundle to include/use all of the shared libraries needed by Qt
+    # Seem to need to run this twice for some reason (fails with error on first run)
+    add_custom_target(deploy
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/Accountant.app" "-always-overwrite"
+        DEPENDS accountant)
+    set_target_properties(accountant PROPERTIES
+        ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/Accountant.app"
+    )
 endif()
