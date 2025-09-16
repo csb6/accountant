@@ -35,13 +35,17 @@ int main(int argc, char* argv[])
     parser.addPositionalArgument("database_path", "Path of the database");
     parser.process(app);
     auto args = parser.positionalArguments();
-    // TODO: if no database path provided, create a new empty database, prompt user to save
-    if(args.size() != 1) {
+    if(args.size() > 1) {
         std::cerr << parser.helpText().toStdString() << "\n";
         return 1;
     }
+    // Empty database path means SQLite will create an in-memory database
+    // that can later be saved to disk
+    QString database_path;
+    if(args.size() == 1) {
+        database_path = args[0];
+    }
 
-    auto database_path = args[0];
     QErrorMessage error_dialog;
     DatabaseManager db_manager;
     QObject::connect(&db_manager, &DatabaseManager::failed_to_load_database,
