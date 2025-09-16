@@ -63,12 +63,11 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
                 if(!schema_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                     throw std::runtime_error(QString("Schema migration failed - missing file: '%1'").arg(schema_filename).toStdString());
                 }
-                QString command;
-                // Each command must be on a single line
-                while(!schema_file.atEnd()) {
-                    QString command = schema_file.readLine();
-                    if(!command.isEmpty() && !command.startsWith("--")) {
-                        exec_query(db, command);
+                auto statements = QString::fromUtf8(schema_file.readAll()).split("\n\n", Qt::SkipEmptyParts);
+                // Each statement must be separated by two newlines
+                for(auto statement : statements) {
+                    if(!statement.startsWith("--")) {
+                        exec_query(db, statement);
                     }
                 }
                 exec_query(db, QString("pragma user_version = %1").arg(latest_schema_version));
