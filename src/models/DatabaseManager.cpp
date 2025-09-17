@@ -11,6 +11,8 @@
 #include <sqlite3.h>
 #endif
 
+using namespace Qt::StringLiterals;
+
 struct DatabaseManager::Impl {
     QSqlDatabase db;
     unsigned int db_gen = 0;
@@ -35,23 +37,23 @@ QSqlDatabase& DatabaseManager::database()
 void DatabaseManager::load_database(QString database_path)
 {
     auto db_name = QString::number(m_impl->db_gen++);
-    auto standby_db = QSqlDatabase::addDatabase("QSQLITE", db_name);
+    auto standby_db = QSqlDatabase::addDatabase(u"QSQLITE"_s, db_name);
     standby_db.setDatabaseName(database_path);
     std::optional<QString> error_message;
     if(!standby_db.open()) {
         error_message = standby_db.lastError().databaseText();
         if(error_message->isEmpty()) {
-            error_message = "Failed to open accounts database";
+            error_message = u"Failed to open accounts database"_s;
         }
     } else {
         try {
-            sql_helpers::upgrade_schema_if_needed(standby_db, latest_schema_version, "schemas");
-            sql_helpers::exec_query(standby_db, "pragma foreign_keys = ON");
+            sql_helpers::upgrade_schema_if_needed(standby_db, latest_schema_version, u"schemas"_s);
+            sql_helpers::exec_query(standby_db, u"pragma foreign_keys = ON"_s);
         } catch(const std::exception& err) {
             // For some reason, Qt does not check if the SQLite database that it opened is actually
             // a valid database file, so we do not find out until attempting to execute the first
             // query (which will then throw an exception)
-            error_message = QString("Failed to read '%1'\n(Reason: %2)").arg(database_path, err.what());
+            error_message = u"Failed to read '%1'\n(Reason: %2)"_s.arg(database_path, err.what());
         }
     }
 

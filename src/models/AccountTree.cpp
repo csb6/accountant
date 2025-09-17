@@ -27,6 +27,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "Roles.hpp"
 #include "SQLColumns.hpp"
 
+using namespace Qt::StringLiterals;
+
 struct AccountTree::Impl {
     explicit
     Impl(QSqlDatabase* db) : db(db) {}
@@ -70,7 +72,7 @@ void AccountTree::reset()
 void AccountTree::load()
 {
     // Database may have changed, so rebuild the query
-    m_impl->query_model.setQuery("select id, name from accounts order by name", *m_impl->db);
+    m_impl->query_model.setQuery(u"select id, name from accounts order by name"_s, *m_impl->db);
     clear();
     build_tree(m_impl->query_model, invisibleRootItem());
 }

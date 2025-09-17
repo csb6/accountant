@@ -24,6 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
+using namespace Qt::StringLiterals;
+
 struct MainWindow::Impl {
     void close_tab(int tab_index)
     {
@@ -52,7 +54,7 @@ MainWindow::MainWindow(AccountTree& account_tree)
     : QMainWindow(), m_impl(new Impl(new QFileDialog(this)))
 {
     m_impl->ui.setupUi(this);
-    m_impl->file_dialog->setNameFilter("*.db");
+    m_impl->file_dialog->setNameFilter(u"*.db"_s);
 
     m_impl->ui.account_tree_view->setModel(&account_tree);
     connect(m_impl->ui.account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);

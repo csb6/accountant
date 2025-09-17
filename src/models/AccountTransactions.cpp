@@ -21,19 +21,21 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QString>
 #include "SQLColumns.hpp"
 
+using namespace Qt::StringLiterals;
+
 AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
     : QSqlTableModel(nullptr, db)
 {
-    setTable("transactions_view");
+    setTable(u"transactions_view"_s);
     const QString column_names[] = {
-        "ID",
-        "Date",
-        "Description",
-        "Source",
-        "Destination",
-        "Unit Price",
-        "Quantity",
-        "Amount"
+        u"ID"_s,
+        u"Date"_s,
+        u"Description"_s,
+        u"Source"_s,
+        u"Destination"_s,
+        u"Unit Price"_s,
+        u"Quantity"_s,
+        u"Amount"_s
     };
     static_assert(std::size(column_names) == TRANSACTIONS_VIEW_COL_COUNT);
     int column_num = 0;
@@ -41,7 +43,7 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
         setHeaderData(column_num++, Qt::Horizontal, name);
     }
 
-    setFilter(QString("source = %1 or destination = %1").arg(account_id));
+    setFilter(u"source = %1 or destination = %1"_s.arg(account_id));
     // Note: can't use OnItemChange because that causes the foreign keys to be exposed
     //  when editing (instead of the human-readable names those keys are mapped to)
     setEditStrategy(EditStrategy::OnManualSubmit);

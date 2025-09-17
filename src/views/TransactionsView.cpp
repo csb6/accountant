@@ -24,6 +24,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
 
+using namespace Qt::StringLiterals;
+
 struct TransactionsView::Impl {
     Impl(TransactionsView* owner, std::unique_ptr<QSqlTableModel> transactions)
         : m_transactions(std::move(transactions)), m_error_modal(new QErrorMessage(owner))
@@ -69,7 +71,7 @@ struct TransactionsView::Impl {
             } else {
                 auto error_msg = m_transactions->lastError().databaseText();
                 if(error_msg.isEmpty()) {
-                    error_msg = "Failed to submit changes (check that new rows have all fields filled out)";
+                    error_msg = u"Failed to submit changes (check that new rows have all fields filled out)"_s;
                 }
                 m_error_modal->showMessage(error_msg);
             }

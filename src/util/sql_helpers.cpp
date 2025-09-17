@@ -23,6 +23,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QString>
+#include <QStringTokenizer>
+
+using namespace Qt::StringLiterals;
 
 namespace sql_helpers {
 
@@ -47,7 +50,7 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
         throw std::runtime_error("Schema folder path does not exist");
     }
 
-    auto query = exec_query(db, "pragma user_version");
+    auto query = exec_query(db, u"pragma user_version"_s);
     try_(query, query.next());
     auto schema_version = query.value(0).toInt();
     if(schema_version > latest_schema_version) {
@@ -57,20 +60,20 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
         for(auto v = schema_version + 1; v <= latest_schema_version; ++v) {
             try {
                 db.transaction();
-                auto schema_filename = QString("%1-schema.sql").arg(v);
+                auto schema_filename = u"%1-schema.sql"_s.arg(v);
                 auto schema_path = schema_folder.filePath(schema_filename);
                 QFile schema_file{schema_path};
                 if(!schema_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                    throw std::runtime_error(QString("Schema migration failed - missing file: '%1'").arg(schema_filename).toStdString());
+                    throw std::runtime_error(u"Schema migration failed - missing file: '%1'"_s.arg(schema_filename).toStdString());
                 }
-                auto statements = QString::fromUtf8(schema_file.readAll()).split("\n\n", Qt::SkipEmptyParts);
+                auto schema_text = QString::fromUtf8(schema_file.readAll());
                 // Each statement must be separated by two newlines
-                for(auto statement : statements) {
-                    if(!statement.startsWith("--")) {
-                        exec_query(db, statement);
+                for(auto statement : QStringTokenizer(schema_text, u"\n\n")) {
+                    if(!statement.startsWith(u"--")) {
+                        exec_query(db, statement.toString());
                     }
                 }
-                exec_query(db, QString("pragma user_version = %1").arg(latest_schema_version));
+                exec_query(db, u"pragma user_version = %1"_s.arg(latest_schema_version));
                 db.commit();
             } catch(const std::exception&) {
                 db.rollback();

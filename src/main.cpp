@@ -26,13 +26,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/DatabaseManager.hpp"
 #include "views/MainWindow.hpp"
 
+using namespace Qt::StringLiterals;
+
 int main(int argc, char* argv[])
 {
     QApplication app{argc, argv};
     QCommandLineParser parser;
-    parser.setApplicationDescription("Accounting program");
+    parser.setApplicationDescription(u"Accounting program"_s);
     parser.addHelpOption();
-    parser.addPositionalArgument("database_path", "Path of the database");
+    parser.addPositionalArgument(u"database_path"_s, u"Path of the database"_s);
     parser.process(app);
     auto args = parser.positionalArguments();
     if(args.size() > 1) {
