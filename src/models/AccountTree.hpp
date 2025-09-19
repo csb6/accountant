@@ -33,7 +33,8 @@ public:
     AccountTree(QSqlDatabase&);
     ~AccountTree() noexcept;
 
-    std::unique_ptr<AccountTransactions> account_transactions(QModelIndex);
+    std::unique_ptr<AccountTransactions> account_transactions(const QModelIndex&);
+    QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
 public slots:
     void reset();
     void load();

@@ -50,7 +50,7 @@ AccountTree::~AccountTree() noexcept
     delete m_impl;
 }
 
-std::unique_ptr<AccountTransactions> AccountTree::account_transactions(QModelIndex index)
+std::unique_ptr<AccountTransactions> AccountTree::account_transactions(const QModelIndex& index)
 {
     auto* item = itemFromIndex(index);
     if(item->hasChildren()) {
@@ -74,6 +74,19 @@ void AccountTree::load()
     m_impl->query_model.setQuery(u"select id, name from accounts order by name"_s, *m_impl->db);
     clear();
     build_tree(m_impl->query_model, invisibleRootItem());
+}
+
+QVariant AccountTree::data(const QModelIndex& index, int role) const
+{
+    if(role == Account_Path_Role && index.isValid()) {
+        auto path = index.data().toString();
+        for(auto it = index.parent(); it.isValid(); it = it.parent()) {
+            path.prepend("/");
+            path.prepend(it.data().toString());
+        }
+        return path;
+    }
+    return QStandardItemModel::data(index, role);
 }
 
 // Assumes query orders the accounts by name (ascending)
@@ -100,9 +113,7 @@ void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
             account_name_stack.push_back(*part);
         }
         if(!account_stack.empty()) {
-            auto* new_item = account_stack.back();
-            new_item->setData(account_id, Account_ID_Role);
-            new_item->setData(account_path, Account_Path_Role);
+            account_stack.back()->setData(account_id, Account_ID_Role);
         }
     }
 }
