@@ -73,7 +73,7 @@ void AccountTree::reset()
 void AccountTree::load()
 {
     // Database may have changed, so rebuild the query
-    m_impl->query_model.setQuery(u"select id, name from accounts order by name"_s, *m_impl->db);
+    m_impl->query_model.setQuery(u"SELECT id, name FROM accounts ORDER BY name"_s, *m_impl->db);
     clear();
     build_tree(m_impl->query_model, invisibleRootItem());
 }
