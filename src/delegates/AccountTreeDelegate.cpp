@@ -16,30 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "AccountTreeDelegate.hpp"
 
-enum TransactionsViewColumn {
-    TRANSACTIONS_VIEW_ID,
-    TRANSACTIONS_VIEW_DATE,
-    TRANSACTIONS_VIEW_DESCRIPTION,
-    TRANSACTIONS_VIEW_SOURCE,
-    TRANSACTIONS_VIEW_DESTINATION,
-    TRANSACTIONS_VIEW_UNIT_PRICE,
-    TRANSACTIONS_VIEW_QUANTITY,
-    TRANSACTIONS_VIEW_AMOUNT,
-
-    TRANSACTIONS_VIEW_COL_COUNT
-};
-
-enum AccountsTableColumn {
-    ACCOUNTS_ID,
-    ACCOUNTS_NAME,
-    ACCOUNTS_KIND
-};
-
-enum AccountKind {
-    ACCOUNT_KIND_BANK = 1,
-    ACCOUNT_KIND_INCOME,
-    ACCOUNT_KIND_EXPENSE,
-    ACCOUNT_KIND_STOCK
-};
+void AccountTreeDelegate::destroyEditor(QWidget*, const QModelIndex& index) const
+{
+    emit editor_closed(index);
+}

@@ -18,28 +18,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-enum TransactionsViewColumn {
-    TRANSACTIONS_VIEW_ID,
-    TRANSACTIONS_VIEW_DATE,
-    TRANSACTIONS_VIEW_DESCRIPTION,
-    TRANSACTIONS_VIEW_SOURCE,
-    TRANSACTIONS_VIEW_DESTINATION,
-    TRANSACTIONS_VIEW_UNIT_PRICE,
-    TRANSACTIONS_VIEW_QUANTITY,
-    TRANSACTIONS_VIEW_AMOUNT,
+#include <QStyledItemDelegate>
 
-    TRANSACTIONS_VIEW_COL_COUNT
-};
+class AccountTreeDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
 
-enum AccountsTableColumn {
-    ACCOUNTS_ID,
-    ACCOUNTS_NAME,
-    ACCOUNTS_KIND
-};
-
-enum AccountKind {
-    ACCOUNT_KIND_BANK = 1,
-    ACCOUNT_KIND_INCOME,
-    ACCOUNT_KIND_EXPENSE,
-    ACCOUNT_KIND_STOCK
+    void destroyEditor(QWidget* editor, const QModelIndex&) const override;
+signals:
+    void editor_closed(const QModelIndex&) const;
 };

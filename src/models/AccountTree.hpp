@@ -38,6 +38,7 @@ public:
 public slots:
     void reset();
     void load();
+    void submit_new_item(const QModelIndex&);
 private:
     struct Impl;
     Impl* m_impl;

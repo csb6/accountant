@@ -21,6 +21,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QFileDialog>
 #include "models/AccountTree.hpp"
 #include "models/Roles.hpp"
+#include "delegates/AccountTreeDelegate.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
@@ -57,6 +58,8 @@ MainWindow::MainWindow(AccountTree& account_tree)
     m_impl->file_dialog->setNameFilter(u"*.db"_s);
 
     m_impl->ui.account_tree_view->setModel(&account_tree);
+    auto* account_tree_delegate = new AccountTreeDelegate(m_impl->ui.account_tree_view);
+    m_impl->ui.account_tree_view->setItemDelegate(account_tree_delegate);
     connect(m_impl->ui.account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
     connect(m_impl->ui.file_open, &QAction::triggered, m_impl->file_dialog, &QDialog::open);
     connect(m_impl->file_dialog, &QDialog::accepted, [this] {
@@ -66,6 +69,36 @@ MainWindow::MainWindow(AccountTree& account_tree)
             emit database_changed(files[0]);
         }
     });
+    connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
+        auto selected_items = m_impl->ui.account_tree_view->selectionModel()->selectedIndexes();
+        if(selected_items.size() != 1) {
+            // Can only add under single parent at a time
+            return;
+        }
+        auto parent = selected_items[0];
+        auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
+        auto* parent_item = account_tree->itemFromIndex(parent);
+        if(!parent_item->hasChildren()) {
+            // TODO: have some way to distinguish between placeholder accounts versus real accounts
+            return;
+        }
+        parent_item->appendRow(new QStandardItem(""));
+        auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
+        m_impl->ui.account_tree_view->setCurrentIndex(new_item);
+        m_impl->ui.account_tree_view->edit(new_item);
+    });
+    connect(m_impl->ui.account_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
+        if(!m_impl->ui.account_tree_view->selectionModel()->hasSelection()) {
+            m_impl->ui.add_account->setEnabled(false);
+        } else {
+            auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
+            // Tree view is guaranteed to have 0 or 1 items selected
+            auto parent = m_impl->ui.account_tree_view->selectionModel()->selectedIndexes()[0];
+            auto* parent_item = account_tree->itemFromIndex(parent);
+            m_impl->ui.add_account->setEnabled(parent_item->hasChildren());
+        }
+    });
+    connect(account_tree_delegate, &AccountTreeDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
 
     auto* tab_bar = m_impl->ui.tabs->tabBar();
     // Accounts tab cannot be closed

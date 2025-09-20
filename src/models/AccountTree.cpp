@@ -19,12 +19,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "AccountTree.hpp"
 #include <algorithm>
 #include <vector>
+#include <QSqlQuery>
 #include <QSqlQueryModel>
 #include <QSqlDatabase>
 #include <QStandardItem>
 #include <QString>
 #include "Roles.hpp"
 #include "SQLColumns.hpp"
+#include "util/sql_helpers.hpp"
 
 using namespace Qt::StringLiterals;
 
@@ -87,6 +89,23 @@ QVariant AccountTree::data(const QModelIndex& index, int role) const
         return path;
     }
     return QStandardItemModel::data(index, role);
+}
+
+void AccountTree::submit_new_item(const QModelIndex& index)
+{
+    if(index.data().toString().isEmpty()) {
+        // Remove the item if no text was put into it
+        removeRow(index.row(), index.parent());
+    } else {
+        auto account_path = index.data(Account_Path_Role).toString();
+        QSqlQuery query{*m_impl->db};
+        query.prepare("INSERT INTO accounts(name, kind) VALUES (?, ?)");
+        query.bindValue(0, account_path);
+        // TODO: support other account kinds
+        query.bindValue(1, ACCOUNT_KIND_BANK);
+        sql_helpers::try_(query, query.exec());
+        load();
+    }
 }
 
 // Assumes query orders the accounts by name (ascending)
