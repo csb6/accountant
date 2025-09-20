@@ -17,20 +17,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "AccountsView.hpp"
+#include <QErrorMessage>
 #include "delegates/EditDelegate.hpp"
 #include "models/AccountTree.hpp"
 #include "ui_accountsview.h"
+#include "util/sql_helpers.hpp"
+
+using namespace Qt::StringLiterals;
 
 struct AccountsView::Impl {
-
     AccountTree* account_tree;
+    QErrorMessage* error_modal;
     Ui::AccountsView ui;
 };
 
 AccountsView::AccountsView(AccountTree& account_tree)
-    : m_impl(new Impl(&account_tree))
+    : m_impl(new Impl(&account_tree, new QErrorMessage(this)))
 {
     m_impl->ui.setupUi(this);
+    m_impl->error_modal->setModal(true);
     m_impl->ui.tree_view->setModel(&account_tree);
     auto* account_tree_delegate = new EditDelegate(m_impl->ui.tree_view);
     m_impl->ui.tree_view->setItemDelegate(account_tree_delegate);
@@ -66,7 +71,11 @@ AccountsView::AccountsView(AccountTree& account_tree)
             // TODO: have some way to distinguish between placeholder accounts versus real accounts
             return;
         }
-        m_impl->account_tree->delete_item(index);
+        try {
+            m_impl->account_tree->delete_item(index);
+        } catch(const sql_helpers::Error&) {
+            m_impl->error_modal->showMessage(u"Failed to delete account (check that no transactions reference this account)"_s);
+        }
         m_impl->ui.delete_account->setEnabled(false);
     });
 

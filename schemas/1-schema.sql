@@ -26,7 +26,7 @@ CREATE TABLE accounts (
 );
 
 CREATE TABLE account_stocks (
-    id INTEGER PRIMARY KEY REFERENCES accounts,
+    id INTEGER PRIMARY KEY REFERENCES accounts ON DELETE CASCADE,
     stock_id INTEGER REFERENCES stocks
 );
 
@@ -34,8 +34,8 @@ CREATE TABLE transactions (
     id INTEGER PRIMARY KEY,
     date TEXT,
     description TEXT,
-    source INTEGER REFERENCES accounts,
-    destination INTEGER REFERENCES accounts,
+    source INTEGER REFERENCES accounts ON DELETE RESTRICT,
+    destination INTEGER REFERENCES accounts ON DELETE RESTRICT,
     CHECK (source != destination)
 );
 
