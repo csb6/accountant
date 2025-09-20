@@ -19,7 +19,7 @@ qt_add_executable(accountant
     models/AccountTree.cpp
     models/AccountTransactions.cpp
     models/DatabaseManager.cpp
-    delegates/AccountTreeDelegate.cpp
+    delegates/EditDelegate.cpp
     util/sql_helpers.cpp)
 target_include_directories(accountant PUBLIC .)
 target_compile_features(accountant PUBLIC cxx_std_20)

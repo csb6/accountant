@@ -17,7 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "AccountsView.hpp"
-#include "delegates/AccountTreeDelegate.hpp"
+#include "delegates/EditDelegate.hpp"
 #include "models/AccountTree.hpp"
 #include "ui_accountsview.h"
 
@@ -32,9 +32,9 @@ AccountsView::AccountsView(AccountTree& account_tree)
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.tree_view->setModel(&account_tree);
-    auto* account_tree_delegate = new AccountTreeDelegate(m_impl->ui.tree_view);
+    auto* account_tree_delegate = new EditDelegate(m_impl->ui.tree_view);
     m_impl->ui.tree_view->setItemDelegate(account_tree_delegate);
-    connect(account_tree_delegate, &AccountTreeDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
+    connect(account_tree_delegate, &EditDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
 
     connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
         auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();

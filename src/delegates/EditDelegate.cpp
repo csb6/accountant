@@ -16,16 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#include "EditDelegate.hpp"
 
-#include <QStyledItemDelegate>
-
-class AccountTreeDelegate : public QStyledItemDelegate {
-    Q_OBJECT
-public:
-    using QStyledItemDelegate::QStyledItemDelegate;
-
-    void destroyEditor(QWidget* editor, const QModelIndex&) const override;
-signals:
-    void editor_closed(const QModelIndex&) const;
-};
+void EditDelegate::destroyEditor(QWidget*, const QModelIndex& index) const
+{
+    emit editor_closed(index);
+}
