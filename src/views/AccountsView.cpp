@@ -26,6 +26,13 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 using namespace Qt::StringLiterals;
 
 struct AccountsView::Impl {
+    void update_button_statuses(const QModelIndex& selected_index)
+    {
+        auto* item = account_tree->itemFromIndex(selected_index);
+        ui.add_account->setEnabled(item->hasChildren());
+        ui.delete_account->setEnabled(!item->hasChildren() && !selected_index.data().toString().isEmpty());
+    }
+
     AccountTree* account_tree;
     QErrorMessage* error_modal;
     Ui::AccountsView ui;
@@ -39,6 +46,9 @@ AccountsView::AccountsView(AccountTree& account_tree)
     m_impl->ui.tree_view->setModel(&account_tree);
     auto* account_tree_delegate = new EditDelegate(m_impl->ui.tree_view);
     m_impl->ui.tree_view->setItemDelegate(account_tree_delegate);
+    connect(account_tree_delegate, &EditDelegate::editor_closed, [this](const QModelIndex& index) {
+        m_impl->update_button_statuses(index);
+    });
     connect(account_tree_delegate, &EditDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
 
     connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
@@ -76,19 +86,16 @@ AccountsView::AccountsView(AccountTree& account_tree)
         } catch(const sql_helpers::Error&) {
             m_impl->error_modal->showMessage(u"Failed to delete account (check that no transactions reference this account)"_s);
         }
-        m_impl->ui.delete_account->setEnabled(false);
     });
 
     connect(m_impl->ui.tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
-        if(!m_impl->ui.tree_view->selectionModel()->hasSelection()) {
+        if(m_impl->ui.tree_view->selectionModel()->hasSelection()) {
+            // Tree view is guaranteed to have exactly 1 item selected
+            auto index = m_impl->ui.tree_view->selectionModel()->selectedIndexes()[0];
+            m_impl->update_button_statuses(index);
+        } else {
             m_impl->ui.add_account->setEnabled(false);
             m_impl->ui.delete_account->setEnabled(false);
-        } else {
-            // Tree view is guaranteed to have 0 or 1 items selected
-            auto index = m_impl->ui.tree_view->selectionModel()->selectedIndexes()[0];
-            auto* item = m_impl->account_tree->itemFromIndex(index);
-            m_impl->ui.add_account->setEnabled(item->hasChildren());
-            m_impl->ui.delete_account->setEnabled(!item->hasChildren() && !index.data().toString().isEmpty());
         }
     });
     connect(m_impl->ui.tree_view, &QAbstractItemView::activated, this, &AccountsView::activated);
