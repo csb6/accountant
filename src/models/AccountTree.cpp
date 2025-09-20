@@ -104,7 +104,6 @@ void AccountTree::submit_new_item(const QModelIndex& index)
         // TODO: support other account kinds
         query.bindValue(1, ACCOUNT_KIND_BANK);
         sql_helpers::try_(query, query.exec());
-        load();
     }
 }
 
@@ -118,7 +117,7 @@ void AccountTree::delete_item(const QModelIndex& index)
     query.prepare("DELETE FROM accounts WHERE id = ?");
     query.bindValue(0, account_id);
     sql_helpers::try_(query, query.exec());
-    load();
+    removeRow(index.row(), index.parent());
 }
 
 // Assumes query orders the accounts by name (ascending)
