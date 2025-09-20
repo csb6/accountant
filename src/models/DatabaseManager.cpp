@@ -5,7 +5,6 @@
 #include <QSqlError>
 #include "util/sql_helpers.hpp"
 #ifdef SQL_QUERY_LOGGING
-#include <cstring>
 #include <iostream>
 #include <QSqlDriver>
 #include <sqlite3.h>
@@ -72,7 +71,7 @@ void DatabaseManager::load_database(QString database_path)
         m_impl->db = standby_db;
         #ifdef SQL_QUERY_LOGGING
             auto v = m_impl->db.driver()->handle();
-            if(v.isValid() && strcmp(v.typeName(), "sqlite3*") == 0) {
+            if(v.isValid()) {
                 auto* sqlite_handle = *static_cast<sqlite3**>(v.data());
                 if(sqlite_handle) {
                     sqlite3_trace_v2(sqlite_handle, SQLITE_TRACE_STMT, [](unsigned, void*, void* p, void*) {
