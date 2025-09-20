@@ -9,7 +9,10 @@
             "request": "launch",
             "name": "Launch accountant",
             "program": "build/src/accountant",
-            "args": "accounts.db"
+            "args": "accounts.db",
+            "osx": {
+                "program": "build/src/accountant.app/Contents/MacOS/accountant"
+            }
         }
     ]
 }
