@@ -17,7 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "sql_helpers.hpp"
-#include <stdexcept>
 #include <QDir>
 #include <QFile>
 #include <QSqlDatabase>
@@ -32,7 +31,7 @@ namespace sql_helpers {
 void try_(QSqlQuery& query, bool status)
 {
     if(!status) {
-        throw std::runtime_error(query.lastError().text().toStdString());
+        throw Error(query.lastError().text().toStdString());
     }
 }
 
@@ -47,14 +46,14 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
 {
     QDir schema_folder{schema_dir_path};
     if(!schema_folder.exists()) {
-        throw std::runtime_error("Schema folder path does not exist");
+        throw Error("Schema folder path does not exist");
     }
 
     auto query = exec_query(db, u"pragma user_version"_s);
     try_(query, query.next());
     auto schema_version = query.value(0).toInt();
     if(schema_version > latest_schema_version) {
-        throw std::runtime_error("Database has newer schema version than this software supports");
+        throw Error("Database has newer schema version than this software supports");
     } else if(schema_version < latest_schema_version) {
         // Migrate to the latest schema
         for(auto v = schema_version + 1; v <= latest_schema_version; ++v) {
@@ -64,7 +63,7 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
                 auto schema_path = schema_folder.filePath(schema_filename);
                 QFile schema_file{schema_path};
                 if(!schema_file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                    throw std::runtime_error(u"Schema migration failed - missing file: '%1'"_s.arg(schema_filename).toStdString());
+                    throw Error(u"Schema migration failed - missing file: '%1'"_s.arg(schema_filename).toStdString());
                 }
                 auto schema_text = QString::fromUtf8(schema_file.readAll());
                 // Each statement must be separated by two newlines

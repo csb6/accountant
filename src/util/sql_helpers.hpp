@@ -18,6 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+#include <stdexcept>
 #include <QSqlQuery>
 #include <QString>
 
@@ -26,6 +27,10 @@ class QSqlDatabase;
 QT_END_NAMESPACE
 
 namespace sql_helpers {
+
+struct Error : public std::runtime_error {
+    using runtime_error::runtime_error;
+};
 
 void try_(QSqlQuery&, bool status);
 QSqlQuery exec_query(QSqlDatabase&, QString query_text);

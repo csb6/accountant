@@ -1,5 +1,4 @@
 #include "DatabaseManager.hpp"
-#include <exception>
 #include <optional>
 #include <QSqlDatabase>
 #include <QSqlError>
@@ -48,7 +47,7 @@ void DatabaseManager::load_database(QString database_path)
         try {
             sql_helpers::upgrade_schema_if_needed(standby_db, latest_schema_version, u"schemas"_s);
             sql_helpers::exec_query(standby_db, u"pragma foreign_keys = ON"_s);
-        } catch(const std::exception& err) {
+        } catch(const sql_helpers::Error& err) {
             // For some reason, Qt does not check if the SQLite database that it opened is actually
             // a valid database file, so we do not find out until attempting to execute the first
             // query (which will then throw an exception)
