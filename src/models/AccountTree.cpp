@@ -99,11 +99,14 @@ void AccountTree::submit_new_item(const QModelIndex& index)
     } else {
         auto account_path = index.data(Account_Path_Role).toString();
         QSqlQuery query{*m_impl->db};
-        query.prepare("INSERT INTO accounts(name, kind) VALUES (?, ?)");
+        query.prepare("INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
         query.bindValue(0, account_path);
         // TODO: support other account kinds
         query.bindValue(1, ACCOUNT_KIND_BANK);
         sql_helpers::try_(query, query.exec());
+        sql_helpers::try_(query, query.next());
+        auto account_id = query.value(0).toInt();
+        setData(index, account_id, Account_ID_Role);
     }
 }
 
