@@ -14,6 +14,7 @@ qt_add_executable(accountant
     MACOSX_BUNDLE
     main.cpp
     views/mainwindow.ui views/MainWindow.cpp
+    views/accountsview.ui views/AccountsView.cpp
     views/transactionsview.ui views/TransactionsView.cpp
     models/AccountTree.cpp
     models/AccountTransactions.cpp

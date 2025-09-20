@@ -46,83 +46,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     </property>
     <item>
      <widget class="QTabWidget" name="tabs">
-      <property name="currentIndex">
-       <number>0</number>
-      </property>
       <property name="tabsClosable">
        <bool>true</bool>
       </property>
       <property name="tabBarAutoHide">
        <bool>true</bool>
       </property>
-      <widget class="QWidget" name="accounts_tab">
-       <attribute name="title">
-        <string>Accounts</string>
-       </attribute>
-       <attribute name="toolTip">
-        <string>Accounts</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <layout class="QHBoxLayout" name="toolbar">
-          <item>
-           <widget class="QToolButton" name="add_account">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="toolTip">
-             <string>Add Account</string>
-            </property>
-            <property name="text">
-             <string>Add Account</string>
-            </property>
-            <property name="icon">
-             <iconset theme="QIcon::ThemeIcon::ListAdd"/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="spacer">
-            <property name="orientation">
-             <enum>Qt::Orientation::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QTreeView" name="account_tree_view">
-          <property name="frameShape">
-           <enum>QFrame::Shape::NoFrame</enum>
-          </property>
-          <property name="editTriggers">
-           <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-          </property>
-          <attribute name="headerVisible">
-           <bool>false</bool>
-          </attribute>
-         </widget>
-        </item>
-       </layout>
-      </widget>
      </widget>
     </item>
    </layout>

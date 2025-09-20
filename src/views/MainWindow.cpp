@@ -19,9 +19,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "MainWindow.hpp"
 #include <cassert>
 #include <QFileDialog>
+#include <QTabBar>
 #include "models/AccountTree.hpp"
 #include "models/Roles.hpp"
-#include "delegates/AccountTreeDelegate.hpp"
+#include "views/AccountsView.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
@@ -40,27 +41,19 @@ struct MainWindow::Impl {
         delete tab;
     }
 
-    void close_all_transaction_tabs()
-    {
-        for(int i = ui.tabs->count() - 1; i > 0; --i) {
-            close_tab(i);
-        }
-    }
-
     QFileDialog* file_dialog;
+    AccountTree* account_tree;
     Ui::MainWindow ui;
 };
 
 MainWindow::MainWindow(AccountTree& account_tree)
-    : QMainWindow(), m_impl(new Impl(new QFileDialog(this)))
+    : QMainWindow(), m_impl(new Impl(new QFileDialog(this), &account_tree))
 {
     m_impl->ui.setupUi(this);
     m_impl->file_dialog->setNameFilter(u"*.db"_s);
 
-    m_impl->ui.account_tree_view->setModel(&account_tree);
-    auto* account_tree_delegate = new AccountTreeDelegate(m_impl->ui.account_tree_view);
-    m_impl->ui.account_tree_view->setItemDelegate(account_tree_delegate);
-    connect(m_impl->ui.account_tree_view, &QTreeView::activated, this, &MainWindow::open_transactions_view);
+    auto* accounts_view = new AccountsView(account_tree);
+    connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
     connect(m_impl->ui.file_open, &QAction::triggered, m_impl->file_dialog, &QDialog::open);
     connect(m_impl->file_dialog, &QDialog::accepted, [this] {
         auto files = m_impl->file_dialog->selectedFiles();
@@ -69,39 +62,11 @@ MainWindow::MainWindow(AccountTree& account_tree)
             emit database_changed(files[0]);
         }
     });
-    connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
-        auto selected_items = m_impl->ui.account_tree_view->selectionModel()->selectedIndexes();
-        if(selected_items.size() != 1) {
-            // Can only add under single parent at a time
-            return;
-        }
-        auto parent = selected_items[0];
-        auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
-        auto* parent_item = account_tree->itemFromIndex(parent);
-        if(!parent_item->hasChildren()) {
-            // TODO: have some way to distinguish between placeholder accounts versus real accounts
-            return;
-        }
-        parent_item->appendRow(new QStandardItem(""));
-        auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
-        m_impl->ui.account_tree_view->setCurrentIndex(new_item);
-        m_impl->ui.account_tree_view->edit(new_item);
-    });
-    connect(m_impl->ui.account_tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
-        if(!m_impl->ui.account_tree_view->selectionModel()->hasSelection()) {
-            m_impl->ui.add_account->setEnabled(false);
-        } else {
-            auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
-            // Tree view is guaranteed to have 0 or 1 items selected
-            auto parent = m_impl->ui.account_tree_view->selectionModel()->selectedIndexes()[0];
-            auto* parent_item = account_tree->itemFromIndex(parent);
-            m_impl->ui.add_account->setEnabled(parent_item->hasChildren());
-        }
-    });
-    connect(account_tree_delegate, &AccountTreeDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
 
-    auto* tab_bar = m_impl->ui.tabs->tabBar();
+    m_impl->ui.tabs->addTab(accounts_view, "Accounts");
+    m_impl->ui.tabs->setTabToolTip(0, "Accounts");
     // Accounts tab cannot be closed
+    auto* tab_bar = m_impl->ui.tabs->tabBar();
     tab_bar->setTabButton(0, QTabBar::ButtonPosition::RightSide, nullptr);
     tab_bar->setTabButton(0, QTabBar::ButtonPosition::LeftSide, nullptr);
     connect(m_impl->ui.tabs, &QTabWidget::tabCloseRequested, [this](int tab_index) {
@@ -116,7 +81,9 @@ MainWindow::~MainWindow() noexcept
 
 void MainWindow::reset()
 {
-    m_impl->close_all_transaction_tabs();
+    for(int i = m_impl->ui.tabs->count() - 1; i > 0; --i) {
+        m_impl->close_tab(i);
+    }
 }
 
 void MainWindow::open_transactions_view(QModelIndex account)
@@ -129,8 +96,7 @@ void MainWindow::open_transactions_view(QModelIndex account)
             return;
         }
     }
-    auto* account_tree = static_cast<AccountTree*>(m_impl->ui.account_tree_view->model());
-    auto account_transactions = account_tree->account_transactions(account);
+    auto account_transactions = m_impl->account_tree->account_transactions(account);
     if(!account_transactions) {
         return;
     }
