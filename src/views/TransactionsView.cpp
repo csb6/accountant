@@ -38,7 +38,7 @@ struct TransactionsView::Impl {
 
         connect(m_ui.new_transaction, &QToolButton::clicked, [this] {
             m_transactions->insertRow(m_transactions->rowCount());
-            mark_dirty();
+            set_dirty();
             // Select the new row (will also autoscroll to that row if not visible)
             m_ui.transactions_view->selectRow(m_transactions->rowCount() - 1);
         });
@@ -58,7 +58,7 @@ struct TransactionsView::Impl {
                 m_transactions->removeRow(item.row());
                 m_hidden_rows.push_back(item.row());
             }
-            mark_dirty();
+            set_dirty();
         });
 
         connect(m_ui.submit_changes, &QToolButton::clicked, [this] {
@@ -85,26 +85,22 @@ struct TransactionsView::Impl {
         // TODO: have custom delegates that avoid using the generated column name for source/destination and
         //  only update cells that have actually changed
 
-        auto resize_columns = [this] {
-            m_ui.transactions_view->resizeColumnsToContents();
-            m_ui.submit_changes->setEnabled(m_transactions->isDirty());
-            m_ui.revert_changes->setEnabled(m_transactions->isDirty());
-        };
-
         // Resize columns whenever a cell is edited (since this could change the width of its column)
-        connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, resize_columns);
+        connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, [this] {
+            m_ui.transactions_view->resizeColumnsToContents();
+            set_dirty(m_transactions->isDirty());
+        });
     }
 
-    void mark_dirty()
+    void set_dirty(bool value = true)
     {
-        m_ui.submit_changes->setEnabled(true);
-        m_ui.revert_changes->setEnabled(true);
+        m_ui.submit_changes->setEnabled(value);
+        m_ui.revert_changes->setEnabled(value);
     }
 
     void clear_pending_changes()
     {
-        m_ui.submit_changes->setEnabled(false);
-        m_ui.revert_changes->setEnabled(false);
+        set_dirty(false);
         for(auto row : m_hidden_rows) {
             m_ui.transactions_view->setRowHidden(row, false);
         }
