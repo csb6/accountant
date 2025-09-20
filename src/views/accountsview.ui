@@ -59,6 +59,22 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="delete_account">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="toolTip">
+        <string>Delete Account</string>
+       </property>
+       <property name="text">
+        <string>Delete Account</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="spacer">
        <property name="orientation">
         <enum>Qt::Orientation::Horizontal</enum>

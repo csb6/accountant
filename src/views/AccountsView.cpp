@@ -54,14 +54,32 @@ AccountsView::AccountsView(AccountTree& account_tree)
         m_impl->ui.tree_view->edit(new_item);
     });
 
+    connect(m_impl->ui.delete_account, &QToolButton::clicked, [this] {
+        auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();
+        if(selected_items.size() != 1) {
+            // Can only add under single parent at a time
+            return;
+        }
+        auto index = selected_items[0];
+        auto* item = m_impl->account_tree->itemFromIndex(index);
+        if(item->hasChildren()) {
+            // TODO: have some way to distinguish between placeholder accounts versus real accounts
+            return;
+        }
+        m_impl->account_tree->delete_item(index);
+        m_impl->ui.delete_account->setEnabled(false);
+    });
+
     connect(m_impl->ui.tree_view->selectionModel(), &QItemSelectionModel::selectionChanged, [this] {
         if(!m_impl->ui.tree_view->selectionModel()->hasSelection()) {
             m_impl->ui.add_account->setEnabled(false);
+            m_impl->ui.delete_account->setEnabled(false);
         } else {
             // Tree view is guaranteed to have 0 or 1 items selected
-            auto parent = m_impl->ui.tree_view->selectionModel()->selectedIndexes()[0];
-            auto* parent_item = m_impl->account_tree->itemFromIndex(parent);
-            m_impl->ui.add_account->setEnabled(parent_item->hasChildren());
+            auto index = m_impl->ui.tree_view->selectionModel()->selectedIndexes()[0];
+            auto* item = m_impl->account_tree->itemFromIndex(index);
+            m_impl->ui.add_account->setEnabled(item->hasChildren());
+            m_impl->ui.delete_account->setEnabled(!item->hasChildren() && !index.data().toString().isEmpty());
         }
     });
     connect(m_impl->ui.tree_view, &QAbstractItemView::activated, this, &AccountsView::activated);

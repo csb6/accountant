@@ -108,6 +108,19 @@ void AccountTree::submit_new_item(const QModelIndex& index)
     }
 }
 
+void AccountTree::delete_item(const QModelIndex& index)
+{
+    if(index.data().toString().isEmpty()) {
+        return;
+    }
+    auto account_id = index.data(Account_ID_Role).toInt();
+    QSqlQuery query{*m_impl->db};
+    query.prepare("DELETE FROM accounts WHERE id = ?");
+    query.bindValue(0, account_id);
+    sql_helpers::try_(query, query.exec());
+    load();
+}
+
 // Assumes query orders the accounts by name (ascending)
 static
 void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
