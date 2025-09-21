@@ -19,12 +19,41 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "TransactionsView.hpp"
 #include <algorithm>
 #include <vector>
+#include <QComboBox>
 #include <QErrorMessage>
+#include <QStyledItemDelegate>
+#include <QSqlQueryModel>
 #include <QSqlError>
 #include "models/SQLColumns.hpp"
 #include "ui_transactionsview.h"
 
 using namespace Qt::StringLiterals;
+
+static const QString relation_query_text = u"SELECT id, name FROM accounts ORDER BY name"_s;
+
+struct AccountRelationDelegate : public QStyledItemDelegate {
+    enum {
+        ID_COLUMN,
+        NAME_COLUMN
+    };
+
+    explicit
+    AccountRelationDelegate(const QSqlDatabase& db, QWidget* parent = nullptr)
+        : QStyledItemDelegate(parent)
+    {
+        m_account_names.setQuery(relation_query_text, db);
+    }
+
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex&) const override;
+    void setEditorData(QWidget* editor, const QModelIndex&) const override;
+    void updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem&, const QModelIndex&) const override;
+    QString displayText(const QVariant&, const QLocale&) const override;
+    void setModelData(QWidget* editor, QAbstractItemModel*, const QModelIndex&) const override;
+private:
+    QModelIndex find_account_name_index(int account_id) const;
+
+    QSqlQueryModel m_account_names;
+};
 
 struct TransactionsView::Impl {
     Impl(TransactionsView* owner, std::unique_ptr<QSqlTableModel> transactions)
@@ -34,7 +63,6 @@ struct TransactionsView::Impl {
         m_error_modal->setModal(true);
         m_ui.transactions_view->setModel(m_transactions.get());
         m_ui.transactions_view->hideColumn(TRANSACTIONS_VIEW_ID);
-        m_ui.transactions_view->resizeColumnsToContents();
 
         connect(m_ui.new_transaction, &QToolButton::clicked, [this] {
             m_transactions->insertRow(m_transactions->rowCount());
@@ -82,14 +110,18 @@ struct TransactionsView::Impl {
             clear_pending_changes();
         });
 
-        // TODO: have custom delegates that avoid using the generated column name for source/destination and
-        //  only update cells that have actually changed
+        auto* account_relation_delegate = new AccountRelationDelegate(m_transactions->database(), owner);
+        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_DESTINATION, account_relation_delegate);
+        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_SOURCE, account_relation_delegate);
 
         // Resize columns whenever a cell is edited (since this could change the width of its column)
-        connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, [this] {
+        auto on_commit = [this] {
             m_ui.transactions_view->resizeColumnsToContents();
             set_dirty(m_transactions->isDirty());
-        });
+        };
+        connect(m_ui.transactions_view->itemDelegate(), &QAbstractItemDelegate::commitData, on_commit);
+        connect(account_relation_delegate, &AccountRelationDelegate::commitData, on_commit);
+        m_ui.transactions_view->resizeColumnsToContents();
     }
 
     void set_dirty(bool value = true)
@@ -121,4 +153,58 @@ TransactionsView::TransactionsView(std::unique_ptr<QSqlTableModel> transactions)
 TransactionsView::~TransactionsView() noexcept
 {
     delete m_impl;
+}
+
+QWidget* AccountRelationDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem&, const QModelIndex& index) const
+{
+    auto& self = const_cast<AccountRelationDelegate&>(*this);
+    const auto* transactions_model = static_cast<const QSqlTableModel*>(index.model());
+    self.m_account_names.setQuery(relation_query_text, transactions_model->database());
+
+    auto* combo_box = new QComboBox(parent);
+    combo_box->setModel(&self.m_account_names);
+    combo_box->setModelColumn(NAME_COLUMN); // Only show the account name, not the ID
+    combo_box->installEventFilter(&self);
+    return combo_box;
+}
+
+void AccountRelationDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
+{
+    auto account_id = index.data().toInt();
+    auto account_name_index = find_account_name_index(account_id);
+    auto* combo_box = static_cast<QComboBox*>(editor);
+    combo_box->setCurrentIndex(account_name_index.row());
+}
+
+void AccountRelationDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex&) const
+{
+    editor->setGeometry(option.rect);
+}
+
+QString AccountRelationDelegate::displayText(const QVariant& value, const QLocale&) const
+{
+    auto account_id = value.toInt();
+    auto account_name_index = find_account_name_index(account_id);
+    return account_name_index.siblingAtColumn(NAME_COLUMN).data().toString();
+}
+
+void AccountRelationDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
+{
+    auto* combo_box = static_cast<QComboBox*>(editor);
+    int row = combo_box->currentIndex();
+    auto account_id = combo_box->model()->index(row, ID_COLUMN).data().toInt();
+    model->setData(index, account_id);
+}
+
+// TODO: this is a linear scan of the query results - might be too slow for large numbers of accounts
+QModelIndex AccountRelationDelegate::find_account_name_index(int account_id) const
+{
+    int row_count = m_account_names.rowCount();
+    for(int row = 0; row < row_count; ++row) {
+        auto i = m_account_names.index(row, ID_COLUMN);
+        if(i.data().toInt() == account_id) {
+            return i;
+        }
+    }
+    return {};
 }
