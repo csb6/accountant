@@ -18,7 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "EditDelegate.hpp"
 
-void EditDelegate::destroyEditor(QWidget*, const QModelIndex& index) const
+void EditDelegate::destroyEditor(QWidget* editor, const QModelIndex& index) const
 {
+    QStyledItemDelegate::destroyEditor(editor, index);
     emit editor_closed(index);
 }
