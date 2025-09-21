@@ -31,7 +31,7 @@ if(SQL_QUERY_LOGGING)
 endif()
 
 if(APPLE)
-    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt)
+    find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_BINS}")
     # Fixup the .app bundle to include/use all of the shared libraries needed by Qt
     # Seem to need to run this twice for some reason (fails with error on first run)
     add_custom_target(deploy
