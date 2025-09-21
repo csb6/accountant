@@ -29,7 +29,7 @@ public:
     MainWindow(AccountTree&);
     ~MainWindow() noexcept;
 signals:
-    void database_changed(QString database_path);
+    void database_path_changed(QString database_path);
 public slots:
     void reset();
 private slots:

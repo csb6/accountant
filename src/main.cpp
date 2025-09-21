@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     db_manager.load_database(database_path);
     AccountTree account_tree{db_manager.database()};
     MainWindow main_window{account_tree};
-    QObject::connect(&main_window, &MainWindow::database_changed, &db_manager, &DatabaseManager::load_database);
+    QObject::connect(&main_window, &MainWindow::database_path_changed, &db_manager, &DatabaseManager::load_database);
     QObject::connect(&db_manager, &DatabaseManager::database_loaded, &account_tree, &AccountTree::load);
     QObject::connect(&db_manager, &DatabaseManager::database_closing, &account_tree, &AccountTree::reset);
     QObject::connect(&db_manager, &DatabaseManager::database_closing, &main_window, &MainWindow::reset);

@@ -17,7 +17,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "MainWindow.hpp"
-#include <cassert>
 #include <QFileDialog>
 #include <QTabBar>
 #include "models/AccountTree.hpp"
@@ -43,30 +42,31 @@ struct MainWindow::Impl {
     }
 
     AccountTree* account_tree;
-    QFileDialog* file_dialog;
     Ui::MainWindow ui;
 };
 
 MainWindow::MainWindow(AccountTree& account_tree)
-    : QMainWindow(), m_impl(new Impl(&account_tree, new QFileDialog(this)))
+    : QMainWindow(), m_impl(new Impl(&account_tree))
 {
     m_impl->ui.setupUi(this);
-    m_impl->file_dialog->setNameFilter(u"*.db"_s);
 
     auto* accounts_view = new AccountsView(account_tree);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
-    connect(m_impl->ui.file_open, &QAction::triggered, m_impl->file_dialog, &QDialog::open);
+    connect(m_impl->ui.file_open, &QAction::triggered, [this] {
+        auto* file_dialog = new QFileDialog();
+        file_dialog->setNameFilter(u"*.db"_s);
+        connect(file_dialog, &QFileDialog::fileSelected, [this](const QString& file_path) {
+            if(!file_path.isEmpty()) {
+                emit database_path_changed(file_path);
+            }
+        });
+        connect(file_dialog, &QDialog::accepted, file_dialog, &QFileDialog::deleteLater);
+        file_dialog->show();
+    });
     connect(m_impl->ui.show_licenses, &QAction::triggered, [] {
         auto* about_box = new AboutDialog();
         connect(about_box, &AboutDialog::accepted, about_box, &AboutDialog::deleteLater);
         about_box->show();
-    });
-    connect(m_impl->file_dialog, &QDialog::accepted, [this] {
-        auto files = m_impl->file_dialog->selectedFiles();
-        assert(files.size() == 1);
-        if(files.size() == 1) {
-            emit database_changed(files[0]);
-        }
     });
 
     m_impl->ui.tabs->addTab(accounts_view, "Accounts");
