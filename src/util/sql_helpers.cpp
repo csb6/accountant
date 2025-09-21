@@ -28,6 +28,7 @@ using namespace Qt::StringLiterals;
 
 namespace sql_helpers {
 
+static
 void try_(QSqlQuery& query, bool status)
 {
     if(!status) {
@@ -35,11 +36,24 @@ void try_(QSqlQuery& query, bool status)
     }
 }
 
-QSqlQuery exec_query(QSqlDatabase& db, QString query_text)
+void prepare(QSqlQuery& query, const QString& query_text)
 {
-    QSqlQuery query{db};
+    try_(query, query.prepare(query_text));
+}
+
+void exec(QSqlQuery& query)
+{
+    try_(query, query.exec());
+}
+
+void exec(QSqlQuery& query, const QString& query_text)
+{
     try_(query, query.exec(query_text));
-    return query;
+}
+
+void next(QSqlQuery& query)
+{
+    try_(query, query.next());
 }
 
 void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QString schema_dir_path)
@@ -49,8 +63,9 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
         throw Error("Schema folder path does not exist");
     }
 
-    auto query = exec_query(db, u"pragma user_version"_s);
-    try_(query, query.next());
+    QSqlQuery query{db};
+    exec(query, u"pragma user_version"_s);
+    next(query);
     auto schema_version = query.value(0).toInt();
     if(schema_version > latest_schema_version) {
         throw Error("Database has newer schema version than this software supports");
@@ -69,10 +84,10 @@ void upgrade_schema_if_needed(QSqlDatabase& db, int latest_schema_version, QStri
                 // Each statement must be separated by two newlines
                 for(auto statement : QStringTokenizer(schema_text, u"\n\n")) {
                     if(!statement.startsWith(u"--")) {
-                        exec_query(db, statement.toString());
+                        exec(query, statement.toString());
                     }
                 }
-                exec_query(db, u"pragma user_version = %1"_s.arg(latest_schema_version));
+                exec(query, u"pragma user_version = %1"_s.arg(latest_schema_version));
                 db.commit();
             } catch(const std::exception&) {
                 db.rollback();

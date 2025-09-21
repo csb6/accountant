@@ -99,12 +99,12 @@ void AccountTree::submit_new_item(const QModelIndex& index)
     } else {
         auto account_path = index.data(Account_Path_Role).toString();
         QSqlQuery query{*m_impl->db};
-        query.prepare("INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
+        sql_helpers::prepare(query, "INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
         query.bindValue(0, account_path);
         // TODO: support other account kinds
         query.bindValue(1, ACCOUNT_KIND_BANK);
-        sql_helpers::try_(query, query.exec());
-        sql_helpers::try_(query, query.next());
+        sql_helpers::exec(query);
+        sql_helpers::next(query);
         auto account_id = query.value(0).toInt();
         setData(index, account_id, Account_ID_Role);
     }
@@ -117,9 +117,9 @@ void AccountTree::delete_item(const QModelIndex& index)
     }
     auto account_id = index.data(Account_ID_Role).toInt();
     QSqlQuery query{*m_impl->db};
-    query.prepare("DELETE FROM accounts WHERE id = ?");
+    sql_helpers::prepare(query, "DELETE FROM accounts WHERE id = ?");
     query.bindValue(0, account_id);
-    sql_helpers::try_(query, query.exec());
+    sql_helpers::exec(query);
     removeRow(index.row(), index.parent());
 }
 

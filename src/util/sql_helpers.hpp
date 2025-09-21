@@ -32,8 +32,10 @@ struct Error : public std::runtime_error {
     using runtime_error::runtime_error;
 };
 
-void try_(QSqlQuery&, bool status);
-QSqlQuery exec_query(QSqlDatabase&, QString query_text);
+void prepare(QSqlQuery&, const QString& query_text);
+void exec(QSqlQuery&, const QString& query_text);
+void exec(QSqlQuery&);
+void next(QSqlQuery&);
 
 void upgrade_schema_if_needed(QSqlDatabase&, int latest_schema_version, QString schema_dir_path);
 
