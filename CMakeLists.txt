@@ -3,8 +3,12 @@ cmake_minimum_required(VERSION 3.25)
 project(Accountant LANGUAGES CXX)
 
 find_package(Qt6 REQUIRED COMPONENTS Core Sql Widgets)
-find_package(PkgConfig)
-pkg_check_modules(libofx "libofx" IMPORTED_TARGET)
+
+option(WITH_OFX "Build with support for reading OFX files" OFF)
+if(WITH_OFX)
+    find_package(PkgConfig)
+    pkg_check_modules(libofx "libofx" IMPORTED_TARGET REQUIRED)
+endif()
 
 option(WITH_ASAN "Build with AddressSanitizer and LeakSanitizer" OFF)
 if(WITH_ASAN)

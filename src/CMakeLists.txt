@@ -4,8 +4,6 @@ if(libofx_FOUND)
     add_executable(ofx_demo ofx_demo.cpp)
     target_compile_features(ofx_demo PUBLIC cxx_std_20)
     target_link_libraries(ofx_demo PUBLIC PkgConfig::libofx)
-else()
-    message("Unable to find libofx - OFX support skipped")
 endif()
 
 qt_standard_project_setup()
