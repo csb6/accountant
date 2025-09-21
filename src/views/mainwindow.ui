@@ -71,7 +71,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     </property>
     <addaction name="file_open"/>
    </widget>
+   <widget class="QMenu" name="menuAbout">
+    <property name="title">
+     <string>About</string>
+    </property>
+    <addaction name="show_licenses"/>
+   </widget>
    <addaction name="file_menu"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="file_open">
@@ -80,6 +87,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="show_licenses">
+   <property name="text">
+    <string>Licenses</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
  </widget>

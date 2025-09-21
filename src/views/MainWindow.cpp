@@ -23,6 +23,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/AccountTree.hpp"
 #include "models/Roles.hpp"
 #include "views/AccountsView.hpp"
+#include "views/AboutDialog.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
@@ -41,13 +42,13 @@ struct MainWindow::Impl {
         delete tab;
     }
 
-    QFileDialog* file_dialog;
     AccountTree* account_tree;
+    QFileDialog* file_dialog;
     Ui::MainWindow ui;
 };
 
 MainWindow::MainWindow(AccountTree& account_tree)
-    : QMainWindow(), m_impl(new Impl(new QFileDialog(this), &account_tree))
+    : QMainWindow(), m_impl(new Impl(&account_tree, new QFileDialog(this)))
 {
     m_impl->ui.setupUi(this);
     m_impl->file_dialog->setNameFilter(u"*.db"_s);
@@ -55,6 +56,11 @@ MainWindow::MainWindow(AccountTree& account_tree)
     auto* accounts_view = new AccountsView(account_tree);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
     connect(m_impl->ui.file_open, &QAction::triggered, m_impl->file_dialog, &QDialog::open);
+    connect(m_impl->ui.show_licenses, &QAction::triggered, [] {
+        auto* about_box = new AboutDialog();
+        connect(about_box, &AboutDialog::accepted, about_box, &AboutDialog::deleteLater);
+        about_box->show();
+    });
     connect(m_impl->file_dialog, &QDialog::accepted, [this] {
         auto files = m_impl->file_dialog->selectedFiles();
         assert(files.size() == 1);

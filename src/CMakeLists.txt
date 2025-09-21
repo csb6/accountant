@@ -14,6 +14,7 @@ qt_add_executable(accountant
     views/mainwindow.ui views/MainWindow.cpp
     views/accountsview.ui views/AccountsView.cpp
     views/transactionsview.ui views/TransactionsView.cpp
+    views/AboutDialog.ui views/AboutDialog.cpp
     models/AccountTree.cpp
     models/AccountTransactions.cpp
     models/DatabaseManager.cpp
