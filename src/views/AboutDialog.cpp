@@ -28,6 +28,7 @@ AboutDialog::AboutDialog(QWidget* parent)
     : QDialog(parent), m_impl(new Impl)
 {
     m_impl->ui.setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
     m_impl->ui.text->setMarkdown(
         u"This program is licensed under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html).\n\n"
         "It uses the following third-party libraries:\n"

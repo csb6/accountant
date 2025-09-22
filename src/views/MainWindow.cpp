@@ -53,19 +53,18 @@ MainWindow::MainWindow(AccountTree& account_tree)
     auto* accounts_view = new AccountsView(account_tree);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
     connect(m_impl->ui.file_open, &QAction::triggered, [this] {
-        auto* file_dialog = new QFileDialog();
+        auto* file_dialog = new QFileDialog(this);
         file_dialog->setNameFilter(u"*.db"_s);
+        file_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(file_dialog, &QFileDialog::fileSelected, [this](const QString& file_path) {
             if(!file_path.isEmpty()) {
                 emit database_path_changed(file_path);
             }
         });
-        connect(file_dialog, &QDialog::accepted, file_dialog, &QFileDialog::deleteLater);
         file_dialog->show();
     });
-    connect(m_impl->ui.show_licenses, &QAction::triggered, [] {
-        auto* about_box = new AboutDialog();
-        connect(about_box, &AboutDialog::accepted, about_box, &AboutDialog::deleteLater);
+    connect(m_impl->ui.show_licenses, &QAction::triggered, [this] {
+        auto* about_box = new AboutDialog(this);
         about_box->show();
     });
 

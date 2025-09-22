@@ -34,15 +34,13 @@ struct AccountsView::Impl {
     }
 
     AccountTree* account_tree;
-    QErrorMessage* error_modal;
     Ui::AccountsView ui;
 };
 
 AccountsView::AccountsView(AccountTree& account_tree)
-    : m_impl(new Impl(&account_tree, new QErrorMessage(this)))
+    : m_impl(new Impl(&account_tree))
 {
     m_impl->ui.setupUi(this);
-    m_impl->error_modal->setModal(true);
     m_impl->ui.tree_view->setModel(&account_tree);
     auto* account_tree_delegate = new EditDelegate(m_impl->ui.tree_view);
     m_impl->ui.tree_view->setItemDelegate(account_tree_delegate);
@@ -84,7 +82,10 @@ AccountsView::AccountsView(AccountTree& account_tree)
         try {
             m_impl->account_tree->delete_item(index);
         } catch(const sql_helpers::Error&) {
-            m_impl->error_modal->showMessage(u"Failed to delete account (check that no transactions reference this account)"_s);
+            auto* error_modal = new QErrorMessage(this);
+            error_modal->setModal(true);
+            error_modal->setAttribute(Qt::WA_DeleteOnClose);
+            error_modal->showMessage(u"Failed to delete account (check that no transactions reference this account)"_s);
         }
     });
 
