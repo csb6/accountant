@@ -31,6 +31,8 @@ using namespace Qt::StringLiterals;
 
 static const QString relation_query_text = u"SELECT id, name FROM accounts ORDER BY name"_s;
 
+/* Maps account IDs into account names for display. Also provides a combo box editor for
+   selecting an account name */
 struct AccountRelationDelegate : public QStyledItemDelegate {
     enum {
         ID_COLUMN,
@@ -53,6 +55,19 @@ private:
     QModelIndex find_account_name_index(int account_id) const;
 
     QSqlQueryModel m_account_names;
+};
+
+/* Disallows edits on cells containing null data */
+struct NullableDelegate : public QStyledItemDelegate {
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
+    {
+        if(index.data().isNull() && !index.siblingAtColumn(TRANSACTIONS_VIEW_ID).data().isNull()) {
+            return nullptr;
+        }
+        return QStyledItemDelegate::createEditor(parent, option, index);
+    }
 };
 
 struct TransactionsView::Impl {
@@ -110,6 +125,8 @@ struct TransactionsView::Impl {
             clear_pending_changes();
         });
 
+        auto* default_delegate = new NullableDelegate(owner);
+        m_ui.transactions_view->setItemDelegate(default_delegate);
         auto* account_relation_delegate = new AccountRelationDelegate(m_transactions->database(), owner);
         m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_DESTINATION, account_relation_delegate);
         m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_SOURCE, account_relation_delegate);
