@@ -112,7 +112,7 @@ struct TransactionsView::Impl {
                 //  button should be greyed out
                 m_ui.delete_transaction->setEnabled(false);
             } else {
-                auto error_msg = m_transactions->lastError().databaseText();
+                auto error_msg = m_transactions->lastError().text();
                 if(error_msg.isEmpty()) {
                     error_msg = u"Failed to submit changes (check that new rows have all fields filled out)"_s;
                 }
