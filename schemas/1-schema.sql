@@ -56,6 +56,31 @@ CREATE VIEW transactions_view (id, date, description, source, destination, unit_
     FULL JOIN cash_transactions ct ON ct.transaction_id = t.id
     FULL JOIN security_transactions st ON st.transaction_id = t.id;
 
+CREATE TRIGGER transactions_view_date_add_cash
+INSTEAD OF INSERT ON transactions_view
+WHEN NEW.amount IS NOT NULL AND NEW.unit_price IS NULL AND NEW.quantity IS NULL
+BEGIN
+    INSERT INTO transactions(date, description, source, destination)
+        VALUES (NEW.date, NEW.description, NEW.source, NEW.destination);
+    INSERT INTO cash_transactions VALUES (last_insert_rowid(), NEW.amount);
+END;
+
+CREATE TRIGGER transactions_view_date_add_stock
+INSTEAD OF INSERT ON transactions_view
+WHEN NEW.amount IS NULL AND NEW.unit_price IS NOT NULL AND NEW.quantity IS NOT NULL
+BEGIN
+    INSERT INTO transactions(date, description, source, destination)
+        VALUES (NEW.date, NEW.description, NEW.source, NEW.destination);
+    INSERT INTO security_transactions VALUES (last_insert_rowid(), NEW.unit_price, NEW.quantity);
+END;
+
+CREATE TRIGGER transactions_view_invalid_add
+INSTEAD OF INSERT ON transactions_view
+WHEN (NEW.amount IS NEW.unit_price) OR (NEW.amount IS NEW.quantity)
+BEGIN
+    SELECT RAISE(ABORT, "Transactions cannot have both cash-specific and security-specific fields");
+END;
+
 CREATE TRIGGER transactions_view_date_update
 INSTEAD OF UPDATE OF date ON transactions_view
 BEGIN
