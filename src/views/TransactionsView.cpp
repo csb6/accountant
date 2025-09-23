@@ -181,7 +181,6 @@ QWidget* AccountRelationDelegate::createEditor(QWidget* parent, const QStyleOpti
     auto* combo_box = new QComboBox(parent);
     combo_box->setModel(&self.m_account_names);
     combo_box->setModelColumn(NAME_COLUMN); // Only show the account name, not the ID
-    combo_box->installEventFilter(&self);
     return combo_box;
 }
 
