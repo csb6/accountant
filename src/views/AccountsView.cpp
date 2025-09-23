@@ -18,12 +18,27 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "AccountsView.hpp"
 #include <QErrorMessage>
-#include "delegates/EditDelegate.hpp"
+#include <QStyledItemDelegate>
 #include "models/AccountTree.hpp"
 #include "ui_accountsview.h"
 #include "util/sql_helpers.hpp"
 
 using namespace Qt::StringLiterals;
+
+/* Delegate that emits a signal right after destroyEditor() is called */
+class EditDelegate : public QStyledItemDelegate {
+    Q_OBJECT
+public:
+    using QStyledItemDelegate::QStyledItemDelegate;
+
+    void destroyEditor(QWidget* editor, const QModelIndex& index) const override
+    {
+        QStyledItemDelegate::destroyEditor(editor, index);
+        emit editor_closed(index);
+    }
+signals:
+    void editor_closed(const QModelIndex&) const;
+};
 
 struct AccountsView::Impl {
     void update_button_statuses(const QModelIndex& selected_index)
@@ -106,3 +121,5 @@ AccountsView::~AccountsView() noexcept
 {
     delete m_impl;
 }
+
+#include "AccountsView.moc"
