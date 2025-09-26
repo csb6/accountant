@@ -18,27 +18,11 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #include "AccountsView.hpp"
 #include <QErrorMessage>
-#include <QStyledItemDelegate>
 #include "models/AccountTree.hpp"
 #include "ui_accountsview.h"
 #include "util/sql_helpers.hpp"
 
 using namespace Qt::StringLiterals;
-
-/* Delegate that emits a signal right after destroyEditor() is called */
-class EditDelegate : public QStyledItemDelegate {
-    Q_OBJECT
-public:
-    using QStyledItemDelegate::QStyledItemDelegate;
-
-    void destroyEditor(QWidget* editor, const QModelIndex& index) const override
-    {
-        QStyledItemDelegate::destroyEditor(editor, index);
-        emit editor_closed(index);
-    }
-signals:
-    void editor_closed(const QModelIndex&) const;
-};
 
 struct AccountsView::Impl {
     void update_button_statuses(const QModelIndex& selected_index)
@@ -57,12 +41,20 @@ AccountsView::AccountsView(AccountTree& account_tree)
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.tree_view->setModel(&account_tree);
-    auto* account_tree_delegate = new EditDelegate(m_impl->ui.tree_view);
-    m_impl->ui.tree_view->setItemDelegate(account_tree_delegate);
-    connect(account_tree_delegate, &EditDelegate::editor_closed, [this](const QModelIndex& index) {
-        m_impl->update_button_statuses(index);
+    connect(m_impl->ui.tree_view->itemDelegate(), &QAbstractItemDelegate::closeEditor, [this] {
+        auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();
+        if(selected_items.size() != 1) {
+            // Can only add under single parent at a time
+            return;
+        }
+        auto index = selected_items[0];
+        if(index.data().toString().isEmpty()) {
+            // Remove the item if no text was put into it
+            m_impl->account_tree->removeRow(index.row(), index.parent());
+        } else {
+            m_impl->update_button_statuses(index);
+        }
     });
-    connect(account_tree_delegate, &EditDelegate::editor_closed, &account_tree, &AccountTree::submit_new_item);
 
     connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
         auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();
@@ -95,7 +87,7 @@ AccountsView::AccountsView(AccountTree& account_tree)
             return;
         }
         try {
-            m_impl->account_tree->delete_item(index);
+            m_impl->account_tree->removeRow(index.row(), index.parent());
         } catch(const sql_helpers::Error&) {
             auto* error_modal = new QErrorMessage(this);
             error_modal->setModal(true);
@@ -121,5 +113,3 @@ AccountsView::~AccountsView() noexcept
 {
     delete m_impl;
 }
-
-#include "AccountsView.moc"

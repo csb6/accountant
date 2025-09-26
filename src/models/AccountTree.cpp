@@ -91,12 +91,17 @@ QVariant AccountTree::data(const QModelIndex& index, int role) const
     return QStandardItemModel::data(index, role);
 }
 
-void AccountTree::submit_new_item(const QModelIndex& index)
+bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if(index.data().toString().isEmpty()) {
-        // Remove the item if no text was put into it
-        removeRow(index.row(), index.parent());
-    } else {
+    if(role == Qt::EditRole) {
+        if(value.toString().isEmpty()) {
+            // Remove the item if no text was put into it
+            removeRow(index.row(), index.parent());
+            return false;
+        }
+        // Set the item's display data (i.e. the account name). This is needed when
+        // building the account path
+        QStandardItemModel::setData(index, value, role);
         auto account_path = index.data(Account_Path_Role).toString();
         QSqlQuery query{*m_impl->db};
         sql_helpers::prepare(query, "INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
@@ -106,21 +111,26 @@ void AccountTree::submit_new_item(const QModelIndex& index)
         sql_helpers::exec(query);
         sql_helpers::next(query);
         auto account_id = query.value(0).toInt();
-        setData(index, account_id, Account_ID_Role);
+        QStandardItemModel::setData(index, account_id, Account_ID_Role);
+        return true;
     }
+    return QStandardItemModel::setData(index, value, role);
 }
 
-void AccountTree::delete_item(const QModelIndex& index)
+bool AccountTree::removeRows(int row, int count, const QModelIndex& parent)
 {
-    if(index.data().toString().isEmpty()) {
-        return;
-    }
-    auto account_id = index.data(Account_ID_Role).toInt();
     QSqlQuery query{*m_impl->db};
-    sql_helpers::prepare(query, "DELETE FROM accounts WHERE id = ?");
-    query.bindValue(0, account_id);
-    sql_helpers::exec(query);
-    removeRow(index.row(), index.parent());
+    for(int i = 0; i < count; ++i) {
+        auto index = this->index(row + i, 0, parent);
+        if(!index.data().toString().isEmpty()) {
+            auto account_id = index.data(Account_ID_Role).toInt();
+            sql_helpers::prepare(query, "DELETE FROM accounts WHERE id = ?");
+            query.bindValue(0, account_id);
+            sql_helpers::exec(query);
+        }
+    }
+    QStandardItemModel::removeRows(row, count, parent);
+    return true;
 }
 
 // Assumes query orders the accounts by name (ascending)

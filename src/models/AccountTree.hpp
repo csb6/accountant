@@ -35,11 +35,11 @@ public:
 
     std::unique_ptr<AccountTransactions> account_transactions(const QModelIndex&);
     QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
+    bool setData(const QModelIndex&, const QVariant &value, int role = Qt::EditRole) override;
+    bool removeRows(int row, int count, const QModelIndex& parent) override;
 public slots:
     void reset();
     void load();
-    void submit_new_item(const QModelIndex&);
-    void delete_item(const QModelIndex&);
 private:
     struct Impl;
     Impl* m_impl;
