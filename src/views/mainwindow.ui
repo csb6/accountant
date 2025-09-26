@@ -85,9 +85,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
    <property name="text">
     <string>Open...</string>
    </property>
-   <property name="shortcut">
-    <string>Ctrl+O</string>
-   </property>
   </action>
   <action name="show_licenses">
    <property name="text">

@@ -49,6 +49,7 @@ MainWindow::MainWindow(AccountTree& account_tree)
     : QMainWindow(), m_impl(new Impl(&account_tree))
 {
     m_impl->ui.setupUi(this);
+    m_impl->ui.file_open->setShortcut(QKeySequence::Open);
 
     auto* accounts_view = new AccountsView(account_tree);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
