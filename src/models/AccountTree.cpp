@@ -20,8 +20,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <algorithm>
 #include <vector>
 #include <QSqlQuery>
-#include <QSqlQueryModel>
-#include <QSqlDatabase>
 #include <QStandardItem>
 #include <QString>
 #include "Roles.hpp"
@@ -35,17 +33,14 @@ struct AccountTree::Impl {
     Impl(QSqlDatabase* db) : db(db) {}
 
     QSqlDatabase* db;
-    QSqlQueryModel query_model;
 };
 
 static
-void build_tree(QSqlQueryModel&, QStandardItem* root);
+void build_tree(const QSqlDatabase&, QStandardItem* root);
 
 AccountTree::AccountTree(QSqlDatabase& db)
     : QStandardItemModel(), m_impl(new Impl{&db})
-{
-    load();
-}
+{}
 
 AccountTree::~AccountTree() noexcept
 {
@@ -63,19 +58,10 @@ std::unique_ptr<AccountTransactions> AccountTree::account_transactions(const QMo
     return std::make_unique<AccountTransactions>(*m_impl->db, account_id);
 }
 
-void AccountTree::reset()
-{
-    // Cleans up any query if active so database can be safely closed
-    m_impl->query_model.clear();
-    clear();
-}
-
 void AccountTree::load()
 {
-    // Database may have changed, so rebuild the query
-    m_impl->query_model.setQuery(u"SELECT id, name FROM accounts ORDER BY name"_s, *m_impl->db);
     clear();
-    build_tree(m_impl->query_model, invisibleRootItem());
+    build_tree(*m_impl->db, invisibleRootItem());
 }
 
 QVariant AccountTree::data(const QModelIndex& index, int role) const
@@ -133,15 +119,16 @@ bool AccountTree::removeRows(int row, int count, const QModelIndex& parent)
     return true;
 }
 
-// Assumes query orders the accounts by name (ascending)
 static
-void build_tree(QSqlQueryModel& query_model, QStandardItem* root)
+void build_tree(const QSqlDatabase& db, QStandardItem* root)
 {
+    QSqlQuery query{db};
+    sql_helpers::exec(query, u"SELECT id, name FROM accounts ORDER BY name"_s);
     std::vector<QString> account_name_stack{u""_s};
     std::vector<QStandardItem*> account_stack{root};
-    for(int row = 0; row < query_model.rowCount(); ++row) {
-        auto account_id = query_model.index(row, ACCOUNTS_ID).data().toInt();
-        auto account_path = query_model.index(row, ACCOUNTS_NAME).data().toString();
+    while(query.next()) {
+        auto account_id = query.value(0).toInt();
+        auto account_path = query.value(1).toString();
         auto parts = account_path.split('/');
         // Find the point where the stack and account_path differ.
         // This is the point in the path where new parts need to be added to the tree.
