@@ -12,12 +12,12 @@ INSERT INTO stocks VALUES (1, "F", "Ford");
 INSERT INTO stocks VALUES (2, "GRMN", "Garmin");
 
 -- Accounts
-INSERT INTO accounts VALUES (1, "Investment/F", 4);
+INSERT INTO accounts VALUES (1, "Investment:F", 4);
 INSERT INTO account_stocks VALUES (1, 1);
-INSERT INTO accounts VALUES (2, "Investment/GRMN", 4);
+INSERT INTO accounts VALUES (2, "Investment:GRMN", 4);
 INSERT INTO account_stocks VALUES (2, 2);
-INSERT INTO accounts VALUES (3, "Income/Salary", 2);
-INSERT INTO accounts VALUES (4, "Assets/Checking", 1);
+INSERT INTO accounts VALUES (3, "Income:Salary", 2);
+INSERT INTO accounts VALUES (4, "Assets:Checking", 1);
 INSERT INTO accounts VALUES (5, "Assets", 5);
 INSERT INTO accounts VALUES (6, "Income", 5);
 INSERT INTO accounts VALUES (7, "Investment", 5);

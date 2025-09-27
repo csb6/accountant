@@ -68,7 +68,7 @@ QVariant AccountTree::data(const QModelIndex& index, int role) const
     if(role == Account_Path_Role && index.isValid()) {
         auto path = index.data().toString();
         for(auto it = index.parent(); it.isValid(); it = it.parent()) {
-            path.prepend('/').prepend(it.data().toString());
+            path.prepend(':').prepend(it.data().toString());
         }
         return path;
     }
@@ -125,7 +125,7 @@ void build_tree(const QSqlDatabase& db, QStandardItem* root)
         auto account_id = query.value(0).toInt();
         auto account_path = query.value(1).toString();
         auto account_kind = query.value(2).toInt();
-        auto parts = account_path.split('/');
+        auto parts = account_path.split(':');
         // Find the point where the stack and account_path differ.
         // This is the point in the path where new parts need to be added to the tree.
         auto[first_to_delete, first_new_part] = std::mismatch(account_name_stack.begin() + 1, account_name_stack.end(), parts.begin(), parts.end());
