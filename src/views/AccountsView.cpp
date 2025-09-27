@@ -19,8 +19,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "AccountsView.hpp"
 #include <QErrorMessage>
 #include "models/AccountTree.hpp"
+#include "models/DatabaseManager.hpp"
 #include "models/Roles.hpp"
-#include "models/SQLColumns.hpp"
+#include "views/NewAccountDialog.hpp"
 #include "ui_accountsview.h"
 #include "util/sql_helpers.hpp"
 
@@ -32,32 +33,19 @@ struct AccountsView::Impl {
         auto* item = account_tree->itemFromIndex(selected_index);
         bool is_placeholder = item->data(Account_Kind_Role).toInt() == ACCOUNT_KIND_PLACEHOLDER;
         ui.add_account->setEnabled(is_placeholder);
-        ui.delete_account->setEnabled(!item->hasChildren() && !selected_index.data().toString().isEmpty());
+        ui.delete_account->setEnabled(!item->hasChildren());
     }
 
     AccountTree* account_tree;
+    DatabaseManager* db_manager;
     Ui::AccountsView ui;
 };
 
-AccountsView::AccountsView(AccountTree& account_tree)
-    : m_impl(new Impl(&account_tree))
+AccountsView::AccountsView(AccountTree& account_tree, DatabaseManager& db_manager)
+    : m_impl(new Impl(&account_tree, &db_manager))
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.tree_view->setModel(&account_tree);
-    connect(m_impl->ui.tree_view->itemDelegate(), &QAbstractItemDelegate::closeEditor, [this] {
-        auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();
-        if(selected_items.size() != 1) {
-            // Can only add under single parent at a time
-            return;
-        }
-        auto index = selected_items[0];
-        if(index.data().toString().isEmpty()) {
-            // Remove the item if no text was put into it
-            m_impl->account_tree->removeRow(index.row(), index.parent());
-        } else {
-            m_impl->update_button_statuses(index);
-        }
-    });
 
     connect(m_impl->ui.add_account, &QToolButton::clicked, [this] {
         auto selected_items = m_impl->ui.tree_view->selectionModel()->selectedIndexes();
@@ -66,14 +54,18 @@ AccountsView::AccountsView(AccountTree& account_tree)
             return;
         }
         auto parent = selected_items[0];
-        auto* parent_item = m_impl->account_tree->itemFromIndex(parent);
-        if(parent_item->data(Account_Kind_Role).toInt() != ACCOUNT_KIND_PLACEHOLDER) {
-            return;
-        }
-        parent_item->appendRow(new QStandardItem(""));
-        auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
-        m_impl->ui.tree_view->setCurrentIndex(new_item);
-        m_impl->ui.tree_view->edit(new_item);
+        auto* dialog = new NewAccountDialog(*m_impl->account_tree, *m_impl->db_manager, parent, this);
+        connect(dialog, &NewAccountDialog::account_created, [this](const QModelIndex& parent_account, const AccountFields& account_fields) {
+            auto* parent_item = m_impl->account_tree->itemFromIndex(parent_account);
+            parent_item->appendRow(new QStandardItem(account_fields.name));
+            auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
+            QVariant value;
+            value.setValue(account_fields);
+            m_impl->account_tree->setData(new_item, value);
+            m_impl->ui.tree_view->setCurrentIndex(new_item);
+            m_impl->update_button_statuses(new_item);
+        });
+        dialog->show();
     });
 
     connect(m_impl->ui.delete_account, &QToolButton::clicked, [this] {
@@ -89,6 +81,10 @@ AccountsView::AccountsView(AccountTree& account_tree)
         }
         try {
             m_impl->account_tree->removeRow(index.row(), index.parent());
+            // Needed because QItemSelectionModel::selectionChanged occurs before removeRow fully
+            // completes, so the child item hasn't been deleted from its parent yet
+            auto new_selected_item = m_impl->ui.tree_view->selectionModel()->selectedIndexes()[0];
+            m_impl->update_button_statuses(new_selected_item);
         } catch(const sql_helpers::Error&) {
             auto* error_modal = new QErrorMessage(this);
             error_modal->setModal(true);

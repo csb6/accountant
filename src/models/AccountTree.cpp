@@ -23,7 +23,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QStandardItem>
 #include <QString>
 #include "Roles.hpp"
-#include "SQLColumns.hpp"
 #include "util/sql_helpers.hpp"
 
 using namespace Qt::StringLiterals;
@@ -80,25 +79,21 @@ QVariant AccountTree::data(const QModelIndex& index, int role) const
 bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     if(role == Qt::EditRole) {
-        if(value.toString().isEmpty()) {
-            // Remove the item if no text was put into it
-            removeRow(index.row(), index.parent());
-            return false;
-        }
+        auto fields = qvariant_cast<AccountFields>(value);
         // Set the item's display data (i.e. the account name). This is needed when
         // building the account path
-        QStandardItemModel::setData(index, value, role);
+        QStandardItemModel::setData(index, fields.name, role);
         auto account_path = index.data(Account_Path_Role).toString();
         QSqlQuery query{*m_impl->db};
         sql_helpers::prepare(query, "INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
         query.bindValue(0, account_path);
-        // TODO: support other account kinds
-        query.bindValue(1, ACCOUNT_KIND_BANK);
+        // TODO: support stock fields
+        query.bindValue(1, static_cast<int>(fields.kind));
         sql_helpers::exec(query);
         sql_helpers::next(query);
         auto account_id = query.value(0).toInt();
         QStandardItemModel::setData(index, account_id, Account_ID_Role);
-        QStandardItemModel::setData(index, ACCOUNT_KIND_BANK, Account_Kind_Role);
+        QStandardItemModel::setData(index, static_cast<int>(fields.kind), Account_Kind_Role);
         return true;
     }
     return QStandardItemModel::setData(index, value, role);

@@ -21,12 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QFrame>
 
 class AccountTree;
+class DatabaseManager;
 
 class AccountsView : public QFrame {
     Q_OBJECT
 public:
-    explicit
-    AccountsView(AccountTree&);
+    AccountsView(AccountTree&, DatabaseManager&);
     ~AccountsView() noexcept;
 signals:
     void activated(const QModelIndex&);

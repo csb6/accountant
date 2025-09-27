@@ -18,35 +18,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
-#include <memory>
-#include <QStandardItemModel>
+#include <QDialog>
 #include <QString>
-#include "models/SQLColumns.hpp"
-#include "AccountTransactions.hpp"
+#include "models/AccountTree.hpp"
 
 QT_BEGIN_NAMESPACE
 class QSqlDatabase;
+class QModelIndex;
 QT_END_NAMESPACE
 
-struct AccountFields {
-    QString name;
-    AccountKind kind;
-};
-Q_DECLARE_METATYPE(AccountFields);
+class DatabaseManager;
 
-class AccountTree : public QStandardItemModel {
+class NewAccountDialog : public QDialog {
     Q_OBJECT
 public:
     explicit
-    AccountTree(QSqlDatabase&);
-    ~AccountTree() noexcept;
-
-    std::unique_ptr<AccountTransactions> account_transactions(const QModelIndex&);
-    QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const override;
-    bool setData(const QModelIndex&, const QVariant& value, int role = Qt::EditRole) override;
-    bool removeRows(int row, int count, const QModelIndex& parent) override;
-public slots:
-    void load();
+    NewAccountDialog(AccountTree&, DatabaseManager&, const QModelIndex& initial_parent_index, QWidget* parent = nullptr);
+    ~NewAccountDialog() noexcept;
+signals:
+    void account_created(const QModelIndex& parent, const AccountFields&);
 private:
     struct Impl;
     Impl* m_impl;

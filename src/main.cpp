@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
     QObject::connect(&db_manager, &DatabaseManager::failed_to_load_database,
                      &error_dialog, qOverload<const QString&>(&QErrorMessage::showMessage));
     AccountTree account_tree{db_manager.database()};
-    MainWindow main_window{account_tree};
+    MainWindow main_window{account_tree, db_manager};
     QObject::connect(&main_window, &MainWindow::database_path_changed, &db_manager, &DatabaseManager::load_database);
     QObject::connect(&db_manager, &DatabaseManager::database_loaded, &account_tree, &AccountTree::load);
     QObject::connect(&db_manager, &DatabaseManager::database_closing, &account_tree, &AccountTree::clear);

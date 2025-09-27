@@ -21,12 +21,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QMainWindow>
 
 class AccountTree;
+class DatabaseManager;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 public:
-    explicit
-    MainWindow(AccountTree&);
+    MainWindow(AccountTree&, DatabaseManager&);
     ~MainWindow() noexcept;
 signals:
     void database_path_changed(QString database_path);

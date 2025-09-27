@@ -20,6 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QFileDialog>
 #include <QTabBar>
 #include "models/AccountTree.hpp"
+#include "models/DatabaseManager.hpp"
 #include "models/Roles.hpp"
 #include "views/AccountsView.hpp"
 #include "views/AboutDialog.hpp"
@@ -45,13 +46,13 @@ struct MainWindow::Impl {
     Ui::MainWindow ui;
 };
 
-MainWindow::MainWindow(AccountTree& account_tree)
+MainWindow::MainWindow(AccountTree& account_tree, DatabaseManager& db_manager)
     : QMainWindow(), m_impl(new Impl(&account_tree))
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.file_open->setShortcut(QKeySequence::Open);
 
-    auto* accounts_view = new AccountsView(account_tree);
+    auto* accounts_view = new AccountsView(account_tree, db_manager);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
     connect(m_impl->ui.file_open, &QAction::triggered, [this] {
         auto* file_dialog = new QFileDialog(this);
