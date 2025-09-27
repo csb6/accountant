@@ -3,6 +3,7 @@
 --   Income = 2
 --   Expense = 3
 --   Stock = 4
+--   Placeholder = 5
 
 pragma foreign_keys = ON;
 
@@ -17,6 +18,9 @@ INSERT INTO accounts VALUES (2, "Investment/GRMN", 4);
 INSERT INTO account_stocks VALUES (2, 2);
 INSERT INTO accounts VALUES (3, "Income/Salary", 2);
 INSERT INTO accounts VALUES (4, "Assets/Checking", 1);
+INSERT INTO accounts VALUES (5, "Assets", 5);
+INSERT INTO accounts VALUES (6, "Income", 5);
+INSERT INTO accounts VALUES (7, "Investment", 5);
 
 -- Transactions
 INSERT INTO transactions VALUES (1, "2025-06-10", "Paycheck", 3, 4);

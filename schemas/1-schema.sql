@@ -19,6 +19,8 @@ INSERT INTO account_kinds VALUES (3, "Expense");
 
 INSERT INTO account_kinds VALUES (4, "Stock");
 
+INSERT INTO account_kinds VALUES (5, "Placeholder");
+
 CREATE TABLE accounts (
     id INTEGER PRIMARY KEY,
     name TEXT UNIQUE NOT NULL,
