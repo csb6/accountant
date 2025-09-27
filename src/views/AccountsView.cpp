@@ -19,6 +19,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "AccountsView.hpp"
 #include <QErrorMessage>
 #include "models/AccountTree.hpp"
+#include "models/Roles.hpp"
+#include "models/SQLColumns.hpp"
 #include "ui_accountsview.h"
 #include "util/sql_helpers.hpp"
 
@@ -28,7 +30,8 @@ struct AccountsView::Impl {
     void update_button_statuses(const QModelIndex& selected_index)
     {
         auto* item = account_tree->itemFromIndex(selected_index);
-        ui.add_account->setEnabled(item->hasChildren());
+        bool is_placeholder = item->data(Account_Kind_Role).toInt() == ACCOUNT_KIND_PLACEHOLDER;
+        ui.add_account->setEnabled(is_placeholder);
         ui.delete_account->setEnabled(!item->hasChildren() && !selected_index.data().toString().isEmpty());
     }
 
@@ -64,8 +67,7 @@ AccountsView::AccountsView(AccountTree& account_tree)
         }
         auto parent = selected_items[0];
         auto* parent_item = m_impl->account_tree->itemFromIndex(parent);
-        if(!parent_item->hasChildren()) {
-            // TODO: have some way to distinguish between placeholder accounts versus real accounts
+        if(parent_item->data(Account_Kind_Role).toInt() != ACCOUNT_KIND_PLACEHOLDER) {
             return;
         }
         parent_item->appendRow(new QStandardItem(""));
@@ -83,7 +85,6 @@ AccountsView::AccountsView(AccountTree& account_tree)
         auto index = selected_items[0];
         auto* item = m_impl->account_tree->itemFromIndex(index);
         if(item->hasChildren()) {
-            // TODO: have some way to distinguish between placeholder accounts versus real accounts
             return;
         }
         try {

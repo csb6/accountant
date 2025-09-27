@@ -98,6 +98,7 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         sql_helpers::next(query);
         auto account_id = query.value(0).toInt();
         QStandardItemModel::setData(index, account_id, Account_ID_Role);
+        QStandardItemModel::setData(index, ACCOUNT_KIND_BANK, Account_Kind_Role);
         return true;
     }
     return QStandardItemModel::setData(index, value, role);
@@ -123,12 +124,13 @@ static
 void build_tree(const QSqlDatabase& db, QStandardItem* root)
 {
     QSqlQuery query{db};
-    sql_helpers::exec(query, u"SELECT id, name FROM accounts ORDER BY name"_s);
+    sql_helpers::exec(query, u"SELECT id, name, kind FROM accounts ORDER BY name"_s);
     std::vector<QString> account_name_stack{u""_s};
     std::vector<QStandardItem*> account_stack{root};
     while(query.next()) {
         auto account_id = query.value(0).toInt();
         auto account_path = query.value(1).toString();
+        auto account_kind = query.value(2).toInt();
         auto parts = account_path.split('/');
         // Find the point where the stack and account_path differ.
         // This is the point in the path where new parts need to be added to the tree.
@@ -144,7 +146,9 @@ void build_tree(const QSqlDatabase& db, QStandardItem* root)
             account_name_stack.push_back(*part);
         }
         if(!account_stack.empty()) {
-            account_stack.back()->setData(account_id, Account_ID_Role);
+            auto* new_account = account_stack.back();
+            new_account->setData(account_id, Account_ID_Role);
+            new_account->setData(account_kind, Account_Kind_Role);
         }
     }
 }

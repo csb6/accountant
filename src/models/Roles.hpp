@@ -23,4 +23,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 enum Role {
     Account_ID_Role = Qt::UserRole + 1,
     Account_Path_Role,
+    Account_Kind_Role,
 };
