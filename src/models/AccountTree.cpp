@@ -68,8 +68,7 @@ QVariant AccountTree::data(const QModelIndex& index, int role) const
     if(role == Account_Path_Role && index.isValid()) {
         auto path = index.data().toString();
         for(auto it = index.parent(); it.isValid(); it = it.parent()) {
-            path.prepend("/");
-            path.prepend(it.data().toString());
+            path.prepend('/').prepend(it.data().toString());
         }
         return path;
     }
@@ -85,7 +84,7 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         QStandardItemModel::setData(index, fields.name, role);
         auto account_path = index.data(Account_Path_Role).toString();
         QSqlQuery query{*m_impl->db};
-        sql_helpers::prepare(query, "INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id");
+        sql_helpers::prepare(query, u"INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id"_s);
         query.bindValue(0, account_path);
         // TODO: support stock fields
         query.bindValue(1, static_cast<int>(fields.kind));
@@ -106,7 +105,7 @@ bool AccountTree::removeRows(int row, int count, const QModelIndex& parent)
         auto index = this->index(row + i, 0, parent);
         if(!index.data().toString().isEmpty()) {
             auto account_id = index.data(Account_ID_Role).toInt();
-            sql_helpers::prepare(query, "DELETE FROM accounts WHERE id = ?");
+            sql_helpers::prepare(query, u"DELETE FROM accounts WHERE id = ?"_s);
             query.bindValue(0, account_id);
             sql_helpers::exec(query);
         }

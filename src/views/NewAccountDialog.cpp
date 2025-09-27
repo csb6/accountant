@@ -23,6 +23,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/SQLColumns.hpp"
 #include "ui_NewAccountDialog.h"
 
+using namespace Qt::StringLiterals;
+
 struct NewAccountDialog::Impl {
     AccountTree* account_tree;
     QSqlQueryModel account_types;
@@ -38,7 +40,7 @@ NewAccountDialog::NewAccountDialog(AccountTree& account_tree, DatabaseManager& d
     m_impl->ui.parent_accounts->setModel(&account_tree);
     m_impl->ui.parent_accounts->setCurrentIndex(initial_parent_index);
 
-    m_impl->account_types.setQuery("SELECT id, name FROM account_kinds ORDER BY name", db_manager.database());
+    m_impl->account_types.setQuery(u"SELECT id, name FROM account_kinds ORDER BY name"_s, db_manager.database());
     m_impl->ui.account_type->setModel(&m_impl->account_types);
     m_impl->ui.account_type->setModelColumn(1);
 
