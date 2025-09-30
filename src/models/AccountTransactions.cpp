@@ -60,11 +60,6 @@ QVariant AccountTransactions::data(const QModelIndex& index, int role) const
             case TRANSACTIONS_VIEW_DATE:
                 data = QDate::fromString(data.toString(), Qt::ISODate);
                 break;
-            case TRANSACTIONS_VIEW_AMOUNT:
-                if(!data.isNull()) {
-                    data = data.toDouble();
-                }
-                break;
             default:
                 break;
         }

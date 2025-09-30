@@ -22,6 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QComboBox>
 #include <QErrorMessage>
 #include <QStyledItemDelegate>
+#include <QDoubleSpinBox>
 #include <QSqlQueryModel>
 #include <QSqlError>
 #include "models/SQLColumns.hpp"
@@ -57,16 +58,20 @@ private:
     QSqlQueryModel m_account_names;
 };
 
-/* Disallows edits on cells containing null data */
-struct NullableDelegate : public QStyledItemDelegate {
+struct DefaultDelegate : public QStyledItemDelegate {
     using QStyledItemDelegate::QStyledItemDelegate;
 
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override
     {
+        /* Disallows edits on cells containing null data (except if the row is new and hasn't been submitted yet) */
         if(index.data().isNull() && !index.siblingAtColumn(TRANSACTIONS_VIEW_ID).data().isNull()) {
             return nullptr;
         }
-        return QStyledItemDelegate::createEditor(parent, option, index);
+        auto* editor = QStyledItemDelegate::createEditor(parent, option, index);
+        if(auto* spinbox = qobject_cast<QDoubleSpinBox*>(editor)) {
+            spinbox->setDecimals(4);
+        }
+        return editor;
     }
 };
 
@@ -125,7 +130,7 @@ struct TransactionsView::Impl {
             clear_pending_changes();
         });
 
-        auto* default_delegate = new NullableDelegate(owner);
+        auto* default_delegate = new DefaultDelegate(owner);
         m_ui.transactions_view->setItemDelegate(default_delegate);
         auto* account_relation_delegate = new AccountRelationDelegate(m_transactions->database(), owner);
         m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_DESTINATION, account_relation_delegate);
