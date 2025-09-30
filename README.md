@@ -12,6 +12,6 @@ easily portable to other platforms that Qt supports
 
 ## License
 
-All files in this repository (unless otherwise specified) are licensed under the GPLv3.
+All files in this repository (unless otherwise specified) are licensed under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html).
 
 See LICENSE for more details.

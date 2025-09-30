@@ -16,6 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 #include "AboutDialog.hpp"
+#include <QFile>
+#include <stdexcept>
 #include "ui_AboutDialog.h"
 
 using namespace Qt::StringLiterals;
@@ -29,15 +31,11 @@ AboutDialog::AboutDialog(QWidget* parent)
 {
     m_impl->ui.setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-    m_impl->ui.text->setMarkdown(
-        u"This program is licensed under the [GNU General Public License, version 3](https://www.gnu.org/licenses/gpl-3.0.html).\n\n"
-        "It uses the following third-party libraries:\n"
-        "- Qt Core (software version " QT_VERSION_STR ", LGPLv3 license)\n"
-        "- Qt SQL (software version " QT_VERSION_STR ", LGPLv3 license)\n"
-        "- Qt Widgets (software version " QT_VERSION_STR ", LGPLv3 license)\n"
-        "- SQLite, (software version 3, Public Domain)\n\n"
-        "For more information about Qt licensing and accessing Qt source code, visit https://www.qt.io/qt-licensing."_s
-    );
+    QFile sbom_file{u":/accountant/about.md"_s};
+    if(!sbom_file.open(QFile::ReadOnly | QFile::Text)) {
+        throw std::runtime_error("Unable to read contents of About page");
+    }
+    m_impl->ui.text->setMarkdown(sbom_file.readAll());
 }
 
 AboutDialog::~AboutDialog() noexcept

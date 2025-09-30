@@ -20,9 +20,29 @@ qt_add_executable(accountant
     models/AccountTransactions.cpp
     models/DatabaseManager.cpp
     util/sql_helpers.cpp)
+
 target_include_directories(accountant PUBLIC .)
 target_compile_features(accountant PUBLIC cxx_std_20)
 target_link_libraries(accountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
+
+qt_add_executable(generate_about_text "${CMAKE_SOURCE_DIR}/tools/generate_about_text.cpp" "${CMAKE_SOURCE_DIR}/tools/spdx_parser.cpp")
+target_include_directories(generate_about_text PUBLIC .)
+target_compile_features(generate_about_text PUBLIC cxx_std_20)
+target_link_libraries(generate_about_text PUBLIC Qt::Core)
+set_property(SOURCE "about.md" PROPERTY QT_RESOURCE_ALIAS "about.md")
+if("${Qt6_VERSION_MAJOR}" EQUAL 6 AND "${Qt6_VERSION_MINOR}" GREATER_EQUAL 8)
+    target_compile_definitions(generate_about_text PRIVATE SPDX_PROVIDED)
+    set(SBOM_PATH "${QT6_INSTALL_PREFIX}/share/qt/sbom/qtbase-${Qt6_VERSION}.spdx")
+else()
+    message(NOTICE "NOTE: SBOM generation disabled since your version of Qt (${Qt6_VERSION}) does not include SPDX files")
+    set(SBOM_PATH ".")
+endif()
+add_custom_command(
+    OUTPUT "about.md"
+    COMMAND generate_about_text "${SBOM_PATH}" "about.md"
+    DEPENDS generate_about_text
+)
+qt_add_resources(accountant "about" PREFIX "/accountant" FILES "${CMAKE_CURRENT_BINARY_DIR}/about.md")
 
 if(SQL_QUERY_LOGGING)
     target_compile_definitions(accountant PRIVATE SQL_QUERY_LOGGING)
