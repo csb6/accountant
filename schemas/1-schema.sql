@@ -1,8 +1,7 @@
 pragma user_version = 1;
 
 CREATE TABLE stocks (
-    id INTEGER PRIMARY KEY,
-    symbol TEXT UNIQUE NOT NULL,
+    symbol TEXT PRIMARY KEY,
     description TEXT NOT NULL
 ) STRICT;
 
@@ -27,9 +26,19 @@ CREATE TABLE accounts (
     kind INTEGER NOT NULL REFERENCES account_kinds
 ) STRICT;
 
+INSERT INTO accounts VALUES (1, "Assets", 5);
+
+INSERT INTO accounts VALUES (2, "Equity", 5);
+
+INSERT INTO accounts VALUES (3, "Expenses", 5);
+
+INSERT INTO accounts VALUES (4, "Income", 5);
+
+INSERT INTO accounts VALUES (5, "Liabilities", 5);
+
 CREATE TABLE account_stocks (
     id INTEGER PRIMARY KEY REFERENCES accounts ON DELETE CASCADE,
-    stock_id INTEGER NOT NULL REFERENCES stocks
+    symbol TEXT NOT NULL REFERENCES stocks
 ) STRICT;
 
 CREATE TABLE transactions (
