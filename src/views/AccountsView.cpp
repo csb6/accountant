@@ -103,7 +103,12 @@ AccountsView::AccountsView(AccountTree& account_tree, DatabaseManager& db_manage
             m_impl->ui.delete_account->setEnabled(false);
         }
     });
-    connect(m_impl->ui.tree_view, &QAbstractItemView::activated, this, &AccountsView::activated);
+
+    connect(m_impl->ui.tree_view, &QAbstractItemView::activated, [this](const QModelIndex& index) {
+        if(index.data(Account_Kind_Role) != ACCOUNT_KIND_PLACEHOLDER) {
+            emit activated(index);
+        }
+    });
 }
 
 AccountsView::~AccountsView() noexcept
