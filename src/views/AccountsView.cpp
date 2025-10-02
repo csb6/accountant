@@ -33,7 +33,7 @@ struct AccountsView::Impl {
         auto* item = account_tree->itemFromIndex(selected_index);
         bool is_placeholder = item->data(Account_Kind_Role).toInt() == ACCOUNT_KIND_PLACEHOLDER;
         ui.add_account->setEnabled(is_placeholder);
-        ui.delete_account->setEnabled(!item->hasChildren());
+        ui.delete_account->setEnabled(!item->hasChildren() && selected_index.parent() != QModelIndex{});
     }
 
     AccountTree* account_tree;
