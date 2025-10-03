@@ -24,9 +24,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/SQLColumns.hpp"
 #include "AccountTransactions.hpp"
 
-QT_BEGIN_NAMESPACE
-class QSqlDatabase;
-QT_END_NAMESPACE
+class DatabaseManager;
 
 struct AccountFields {
     QString name;
@@ -38,7 +36,7 @@ class AccountTree : public QStandardItemModel {
     Q_OBJECT
 public:
     explicit
-    AccountTree(QSqlDatabase&);
+    AccountTree(DatabaseManager&);
     ~AccountTree() noexcept;
 
     std::unique_ptr<AccountTransactions> account_transactions(const QModelIndex&);

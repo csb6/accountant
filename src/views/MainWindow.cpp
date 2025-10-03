@@ -17,6 +17,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "MainWindow.hpp"
+#include <QErrorMessage>
 #include <QFileDialog>
 #include <QTabBar>
 #include "models/AccountTree.hpp"
@@ -51,6 +52,15 @@ MainWindow::MainWindow(AccountTree& account_tree, DatabaseManager& db_manager)
 {
     m_impl->ui.setupUi(this);
     m_impl->ui.file_open->setShortcut(QKeySequence::Open);
+
+    connect(this, &MainWindow::database_path_changed, &db_manager, &DatabaseManager::load_database);
+    connect(&db_manager, &DatabaseManager::database_closing, this, &MainWindow::reset);
+
+    connect(&db_manager, &DatabaseManager::failed_to_load_database, [this](const QString& message) {
+        auto* error_dialog = new QErrorMessage(this);
+        error_dialog->setAttribute(Qt::WA_DeleteOnClose);
+        error_dialog->showMessage(message);
+    });
 
     auto* accounts_view = new AccountsView(account_tree, db_manager);
     connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);

@@ -22,24 +22,25 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include <QSqlQuery>
 #include <QStandardItem>
 #include <QString>
+#include "DatabaseManager.hpp"
 #include "Roles.hpp"
 #include "util/sql_helpers.hpp"
 
 using namespace Qt::StringLiterals;
 
 struct AccountTree::Impl {
-    explicit
-    Impl(QSqlDatabase* db) : db(db) {}
-
-    QSqlDatabase* db;
+    DatabaseManager* db_manager;
 };
 
 static
 void build_tree(const QSqlDatabase&, QStandardItem* root);
 
-AccountTree::AccountTree(QSqlDatabase& db)
-    : QStandardItemModel(), m_impl(new Impl{&db})
-{}
+AccountTree::AccountTree(DatabaseManager& db_manager)
+    : QStandardItemModel(), m_impl(new Impl{&db_manager})
+{
+    connect(&db_manager, &DatabaseManager::database_loaded, this, &AccountTree::load);
+    connect(&db_manager, &DatabaseManager::database_closing, this, &AccountTree::clear);
+}
 
 AccountTree::~AccountTree() noexcept
 {
@@ -54,13 +55,13 @@ std::unique_ptr<AccountTransactions> AccountTree::account_transactions(const QMo
         return {};
     }
     auto account_id = item->data(Account_ID_Role).toInt();
-    return std::make_unique<AccountTransactions>(*m_impl->db, account_id);
+    return std::make_unique<AccountTransactions>(m_impl->db_manager->database(), account_id);
 }
 
 void AccountTree::load()
 {
     clear();
-    build_tree(*m_impl->db, invisibleRootItem());
+    build_tree(m_impl->db_manager->database(), invisibleRootItem());
 }
 
 QVariant AccountTree::data(const QModelIndex& index, int role) const
@@ -83,7 +84,7 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         // building the account path
         QStandardItemModel::setData(index, fields.name, role);
         auto account_path = index.data(Account_Path_Role).toString();
-        QSqlQuery query{*m_impl->db};
+        QSqlQuery query{m_impl->db_manager->database()};
         sql_helpers::prepare(query, u"INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id"_s);
         query.bindValue(0, account_path);
         // TODO: support stock fields
@@ -100,7 +101,7 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
 
 bool AccountTree::removeRows(int row, int count, const QModelIndex& parent)
 {
-    QSqlQuery query{*m_impl->db};
+    QSqlQuery query{m_impl->db_manager->database()};
     for(int i = 0; i < count; ++i) {
         auto index = this->index(row + i, 0, parent);
         if(!index.data().toString().isEmpty()) {
