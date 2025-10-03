@@ -94,8 +94,8 @@ static const StringPair additional_copyrights[] = {
     {u"SPDXRef-Package-qtbase-system-3rdparty-SQLite3"_s, u"Public Domain"_s}
 };
 
-// The SPDX file provides a choice of options for these packages - this is the license we will use for them
-// under for this project
+// The SPDX file provides a choice of licenses for these packages - this is the license we will use for them
+// for this project
 static const StringPair license_choices[] = {
     {u"SPDXRef-Package-qtbase-qt-3rdparty-sources-Core-Attribution-blake2"_s,            u"Apache-2.0"_s},
     {u"SPDXRef-Package-qtbase-qt-3rdparty-sources-DBus-Attribution-libdbus-1-headers"_s, u"GPL-2.0-or-later"_s},

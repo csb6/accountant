@@ -43,16 +43,16 @@ SPDX_Version Parser::parse_version()
     auto version_str = line.section('-', 1);
     auto version_parts = version_str.split('.');
     if(version_parts.size() < 2) {
-        throw std::runtime_error(u"Error: unexpeced format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
+        throw std::runtime_error(u"Error: unexpected format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
     }
     bool ok;
     auto major_version = version_parts[0].toInt(&ok);
     if(!ok) {
-        throw std::runtime_error(u"Error: unexpeced format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
+        throw std::runtime_error(u"Error: unexpected format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
     }
     auto minor_version = version_parts[1].toInt(&ok);
     if(!ok) {
-        throw std::runtime_error(u"Error: unexpeced format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
+        throw std::runtime_error(u"Error: unexpected format for SPDXVersion field at beginning of %1"_s.arg(spdx_file->fileName()).toStdString());
     }
     return {major_version, minor_version};
 }
