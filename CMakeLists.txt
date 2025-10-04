@@ -2,7 +2,13 @@ cmake_minimum_required(VERSION 3.25)
 
 project(Accountant LANGUAGES CXX)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Sql Widgets)
+set(COMP_LIST Core Sql Widgets)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    include(CTest)
+    list(APPEND COMP_LIST Test)
+endif()
+
+find_package(Qt6 REQUIRED COMPONENTS ${COMP_LIST})
 
 option(WITH_OFX "Build with support for reading OFX files" OFF)
 if(WITH_OFX)
@@ -23,3 +29,7 @@ if(SQL_QUERY_LOGGING)
 endif()
 
 add_subdirectory(src)
+
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
