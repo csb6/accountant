@@ -22,7 +22,6 @@ qt_add_executable(qaccountant
     util/sql_helpers.cpp)
 
 target_include_directories(qaccountant PUBLIC .)
-target_precompile_headers(qaccountant PRIVATE <qobject.h>)
 target_compile_features(qaccountant PUBLIC cxx_std_20)
 if(WITH_COMPILE_TIME_TRACE)
     target_compile_options(qaccountant PUBLIC -ftime-trace=compile_time_report)
@@ -31,6 +30,7 @@ target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 
 qt_add_executable(generate_about_text "${CMAKE_SOURCE_DIR}/tools/generate_about_text.cpp" "${CMAKE_SOURCE_DIR}/tools/spdx_parser.cpp")
 target_include_directories(generate_about_text PUBLIC .)
+target_precompile_headers(generate_about_text PRIVATE <qobject.h>)
 target_compile_features(generate_about_text PUBLIC cxx_std_20)
 target_link_libraries(generate_about_text PUBLIC Qt::Core)
 set_property(SOURCE "about.md" PROPERTY QT_RESOURCE_ALIAS "about.md")
@@ -47,6 +47,7 @@ add_custom_command(
     DEPENDS generate_about_text
 )
 qt_add_resources(qaccountant "about" PREFIX "/qaccountant" FILES "${CMAKE_CURRENT_BINARY_DIR}/about.md")
+target_precompile_headers(qaccountant REUSE_FROM generate_about_text)
 
 if(SQL_QUERY_LOGGING)
     target_compile_definitions(qaccountant PRIVATE SQL_QUERY_LOGGING)
