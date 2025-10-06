@@ -24,6 +24,9 @@ qt_add_executable(qaccountant
 target_include_directories(qaccountant PUBLIC .)
 target_precompile_headers(qaccountant PRIVATE <qobject.h>)
 target_compile_features(qaccountant PUBLIC cxx_std_20)
+if(WITH_COMPILE_TIME_TRACE)
+    target_compile_options(qaccountant PUBLIC -ftime-trace=compile_time_report)
+endif()
 target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 
 qt_add_executable(generate_about_text "${CMAKE_SOURCE_DIR}/tools/generate_about_text.cpp" "${CMAKE_SOURCE_DIR}/tools/spdx_parser.cpp")

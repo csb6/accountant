@@ -22,6 +22,8 @@ if(WITH_ASAN)
     string(APPEND CMAKE_CXX_FLAGS " -fsanitize=address")
 endif()
 
+option(WITH_COMPILE_TIME_TRACE "(Clang only) Build with compile time tracing (paste 'compile_time_report' file into https://speedscope.app)" OFF)
+
 option(SQL_QUERY_LOGGING "Log text of queries as they are sent to SQLite" OFF)
 if(SQL_QUERY_LOGGING)
     message(NOTICE "NOTE: The installation of SQLite being used MUST be the same as the installation used by Qt's SQlite plugin")
