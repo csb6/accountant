@@ -55,7 +55,8 @@ std::unique_ptr<AccountTransactions> AccountTree::account_transactions(const QMo
         return {};
     }
     auto account_id = item->data(Account_ID_Role).toInt();
-    return std::make_unique<AccountTransactions>(m_impl->db_manager->database(), account_id);
+    auto account_kind = static_cast<AccountKind>(item->data(Account_Kind_Role).toInt());
+    return std::make_unique<AccountTransactions>(m_impl->db_manager->database(), account_id, account_kind);
 }
 
 void AccountTree::load()

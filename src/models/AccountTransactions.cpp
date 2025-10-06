@@ -17,27 +17,39 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 #include "AccountTransactions.hpp"
+#include <stdexcept>
+#include <vector>
 #include <QDate>
 #include <QString>
 #include "SQLColumns.hpp"
 
 using namespace Qt::StringLiterals;
 
-AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id)
+AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id, AccountKind account_kind)
     : QSqlTableModel(nullptr, db)
 {
-    setTable(u"transactions_view"_s);
-    const QString column_names[] = {
+    std::vector<QString> column_names{
         u"ID"_s,
         u"Date"_s,
         u"Description"_s,
         u"Source"_s,
-        u"Destination"_s,
-        u"Unit Price"_s,
-        u"Quantity"_s,
-        u"Amount"_s
+        u"Destination"_s
     };
-    static_assert(std::size(column_names) == TRANSACTIONS_VIEW_COL_COUNT);
+    switch(account_kind) {
+        case ACCOUNT_KIND_BANK:
+        case ACCOUNT_KIND_INCOME:
+        case ACCOUNT_KIND_EXPENSE:
+            setTable(u"transactions_as_cash_view"_s);
+            column_names.push_back(u"Amount"_s);
+            break;
+        case ACCOUNT_KIND_STOCK:
+            setTable(u"security_transactions_view"_s);
+            column_names.push_back(u"Unit Price"_s);
+            column_names.push_back(u"Quantity"_s);
+            break;
+        default:
+            throw std::runtime_error("Unexpected account kind used with AccountTransactions model");
+    }
     int column_num = 0;
     for(const auto& name : column_names) {
         setHeaderData(column_num++, Qt::Horizontal, name);

@@ -19,11 +19,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #pragma once
 
 #include <QSqlTableModel>
+#include "models/SQLColumns.hpp"
 
 class AccountTransactions : public QSqlTableModel {
     Q_OBJECT
 public:
-    AccountTransactions(QSqlDatabase&, int account_id);
+    AccountTransactions(QSqlDatabase&, int account_id, AccountKind);
 
     QVariant data(const QModelIndex&, int role) const override;
 };

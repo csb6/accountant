@@ -18,17 +18,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 #pragma once
 
+// Shared between transactions_as_cash_view and security_transactions_view
 enum TransactionsViewColumn {
     TRANSACTIONS_VIEW_ID,
     TRANSACTIONS_VIEW_DATE,
     TRANSACTIONS_VIEW_DESCRIPTION,
     TRANSACTIONS_VIEW_SOURCE,
     TRANSACTIONS_VIEW_DESTINATION,
-    TRANSACTIONS_VIEW_UNIT_PRICE,
-    TRANSACTIONS_VIEW_QUANTITY,
-    TRANSACTIONS_VIEW_AMOUNT,
 
     TRANSACTIONS_VIEW_COL_COUNT
+};
+
+enum TransactionsAsCashViewColumn {
+    TRANSACTIONS_AS_CASH_VIEW_AMOUNT = TRANSACTIONS_VIEW_COL_COUNT
+};
+
+enum SecurityTransactionViewColumn {
+    SECURITY_TRANSACTIONS_VIEW_UNIT_PRICE = TRANSACTIONS_VIEW_COL_COUNT,
+    SECURITY_TRANSACTIONS_VIEW_QUANTITY
 };
 
 enum AccountsTableColumn {

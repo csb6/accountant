@@ -133,8 +133,8 @@ struct TransactionsView::Impl {
         auto* default_delegate = new DefaultDelegate(owner);
         m_ui.transactions_view->setItemDelegate(default_delegate);
         auto* account_relation_delegate = new AccountRelationDelegate(m_transactions->database(), owner);
-        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_DESTINATION, account_relation_delegate);
         m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_SOURCE, account_relation_delegate);
+        m_ui.transactions_view->setItemDelegateForColumn(TRANSACTIONS_VIEW_DESTINATION, account_relation_delegate);
 
         // Resize columns whenever a cell is edited (since this could change the width of its column)
         auto on_commit = [this] {
