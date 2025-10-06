@@ -22,6 +22,7 @@ qt_add_executable(qaccountant
     util/sql_helpers.cpp)
 
 target_include_directories(qaccountant PUBLIC .)
+target_precompile_headers(qaccountant PRIVATE <qobject.h>)
 target_compile_features(qaccountant PUBLIC cxx_std_20)
 target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 
