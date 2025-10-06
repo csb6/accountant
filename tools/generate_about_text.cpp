@@ -163,10 +163,10 @@ int main(int argc, char **argv)
     }
 
     output_file.write(
-        "**Accountant** - accounting program\n\n"
-        "Copyright (C) 2025 Cole Blakley\n\n"
+        "Accountant  Copyright (C) 2025  Cole Blakley\n\n"
         "This program is licensed under the [GNU General Public License, version "
-        "3](https://www.gnu.org/licenses/gpl-3.0.html).\n\n"
+        "3](https://www.gnu.org/licenses/gpl-3.0.html) and comes with ABSOLUTELY "
+        "NO WARRANTY.\n\n"
         "----\n\n"
         "This program uses the following third-party libraries:\n");
     #ifdef SPDX_PROVIDED
