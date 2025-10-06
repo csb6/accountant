@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(Accountant LANGUAGES CXX)
+project(QAccountant LANGUAGES CXX)
 
 set(COMP_LIST Core Sql Widgets)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)

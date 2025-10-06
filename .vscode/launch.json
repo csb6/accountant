@@ -7,11 +7,11 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Launch accountant",
-            "program": "build/src/accountant",
+            "name": "Launch qaccountant",
+            "program": "build/src/qaccountant",
             "args": "accounts.db",
             "osx": {
-                "program": "build/src/accountant.app/Contents/MacOS/accountant"
+                "program": "build/src/qaccountant.app/Contents/MacOS/qaccountant"
             }
         }
     ]

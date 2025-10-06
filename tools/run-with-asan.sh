@@ -4,4 +4,4 @@
 
 set -e
 
-ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=tools/leak-suppressions.txt build/src/accountant $@
+ASAN_OPTIONS=detect_leaks=1 LSAN_OPTIONS=suppressions=tools/leak-suppressions.txt build/src/qaccountant $@

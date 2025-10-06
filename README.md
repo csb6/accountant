@@ -1,14 +1,15 @@
-# Accountant
+# QAccountant
 
-A simple accounting program based on an SQLite database
+A personal accounting program
 
-It is known to work on macOS 13.7 (Ventura) and Debian 12 (Bookworm), but should be
+It is known to work on macOS 13 (Ventura) and Debian 12 (Bookworm), but should be
 easily portable to other platforms that Qt supports
 
 ## Dependencies
 
 - Qt6 (Core, Sql, Widgets)
 - LibOFX (optional)
+- SQLite
 
 ## License
 

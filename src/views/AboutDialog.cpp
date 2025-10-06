@@ -1,5 +1,5 @@
 /*
-Accountant - accounting program
+QAccountant - personal accounting software
 Copyright (C) 2025  Cole Blakley
 
 This program is free software: you can redistribute it and/or modify
@@ -31,7 +31,7 @@ AboutDialog::AboutDialog(QWidget* parent)
 {
     m_impl->ui.setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-    QFile sbom_file{u":/accountant/about.md"_s};
+    QFile sbom_file{u":/qaccountant/about.md"_s};
     if(!sbom_file.open(QFile::ReadOnly | QFile::Text)) {
         throw std::runtime_error("Unable to read contents of About page");
     }

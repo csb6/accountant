@@ -8,7 +8,7 @@ endif()
 
 qt_standard_project_setup()
 
-qt_add_executable(accountant
+qt_add_executable(qaccountant
     MACOSX_BUNDLE
     main.cpp
     views/MainWindow.ui views/MainWindow.cpp
@@ -21,9 +21,9 @@ qt_add_executable(accountant
     models/DatabaseManager.cpp
     util/sql_helpers.cpp)
 
-target_include_directories(accountant PUBLIC .)
-target_compile_features(accountant PUBLIC cxx_std_20)
-target_link_libraries(accountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
+target_include_directories(qaccountant PUBLIC .)
+target_compile_features(qaccountant PUBLIC cxx_std_20)
+target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
 
 qt_add_executable(generate_about_text "${CMAKE_SOURCE_DIR}/tools/generate_about_text.cpp" "${CMAKE_SOURCE_DIR}/tools/spdx_parser.cpp")
 target_include_directories(generate_about_text PUBLIC .)
@@ -42,11 +42,11 @@ add_custom_command(
     COMMAND generate_about_text "${SBOM_PATH}" "about.md"
     DEPENDS generate_about_text
 )
-qt_add_resources(accountant "about" PREFIX "/accountant" FILES "${CMAKE_CURRENT_BINARY_DIR}/about.md")
+qt_add_resources(qaccountant "about" PREFIX "/qaccountant" FILES "${CMAKE_CURRENT_BINARY_DIR}/about.md")
 
 if(SQL_QUERY_LOGGING)
-    target_compile_definitions(accountant PRIVATE SQL_QUERY_LOGGING)
-    target_link_libraries(accountant PUBLIC SQLite::SQLite3)
+    target_compile_definitions(qaccountant PRIVATE SQL_QUERY_LOGGING)
+    target_link_libraries(qaccountant PUBLIC SQLite::SQLite3)
 endif()
 
 if(APPLE)
@@ -54,9 +54,9 @@ if(APPLE)
     # Fixup the .app bundle to include/use all of the shared libraries needed by Qt
     # Seem to need to run this twice for some reason (fails with error on first run)
     add_custom_target(deploy
-        COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/Accountant.app" "-always-overwrite"
-        DEPENDS accountant)
-    set_target_properties(accountant PROPERTIES
-        ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/Accountant.app"
+        COMMAND "${MACDEPLOYQT_EXECUTABLE}" "${CMAKE_CURRENT_BINARY_DIR}/QAccountant.app" "-always-overwrite"
+        DEPENDS qaccountant)
+    set_target_properties(qaccountant PROPERTIES
+        ADDITIONAL_CLEAN_FILES "${CMAKE_CURRENT_BINARY_DIR}/QAccountant.app"
     )
 endif()

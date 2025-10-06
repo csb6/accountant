@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Accountant - accounting program
+QAccountant - personal accounting software
 Copyright (C) 2025  Cole Blakley
 
 This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About Accountant</string>
+   <string>About QAccountant</string>
   </property>
   <property name="modal">
    <bool>true</bool>

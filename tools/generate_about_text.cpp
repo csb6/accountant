@@ -1,5 +1,5 @@
 /*
-Accountant - accounting program
+QAccountant - personal accounting software
 Copyright (C) 2025  Cole Blakley
 
 This program is free software: you can redistribute it and/or modify
@@ -163,7 +163,7 @@ int main(int argc, char **argv)
     }
 
     output_file.write(
-        "Accountant  Copyright (C) 2025  Cole Blakley\n\n"
+        "QAccountant  Copyright (C) 2025  Cole Blakley\n\n"
         "This program is licensed under the [GNU General Public License, version "
         "3](https://www.gnu.org/licenses/gpl-3.0.html) and comes with ABSOLUTELY "
         "NO WARRANTY.\n\n"

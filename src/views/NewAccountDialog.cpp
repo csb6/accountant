@@ -1,5 +1,5 @@
 /*
-Accountant - accounting program
+QAccountant - personal accounting software
 Copyright (C) 2025  Cole Blakley
 
 This program is free software: you can redistribute it and/or modify
