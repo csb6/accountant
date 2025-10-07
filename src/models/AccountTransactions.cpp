@@ -29,7 +29,6 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id, Accou
     : QSqlTableModel(nullptr, db)
 {
     std::vector<QString> column_names{
-        u"ID"_s,
         u"Date"_s,
         u"Description"_s,
         u"Source"_s,
@@ -50,7 +49,7 @@ AccountTransactions::AccountTransactions(QSqlDatabase& db, int account_id, Accou
         default:
             throw std::runtime_error("Unexpected account kind used with AccountTransactions model");
     }
-    int column_num = 0;
+    int column_num = TRANSACTIONS_VIEW_DATE;
     for(const auto& name : column_names) {
         setHeaderData(column_num++, Qt::Horizontal, name);
     }
