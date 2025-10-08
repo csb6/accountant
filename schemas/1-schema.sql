@@ -1,6 +1,6 @@
 pragma user_version = 1;
 
-CREATE TABLE stocks (
+CREATE TABLE securities (
     symbol TEXT PRIMARY KEY,
     description TEXT NOT NULL
 ) STRICT;
@@ -36,9 +36,9 @@ INSERT INTO accounts VALUES (4, "Income", 5);
 
 INSERT INTO accounts VALUES (5, "Liabilities", 5);
 
-CREATE TABLE account_stocks (
+CREATE TABLE account_securities (
     id INTEGER PRIMARY KEY REFERENCES accounts ON DELETE CASCADE,
-    symbol TEXT NOT NULL REFERENCES stocks
+    symbol TEXT NOT NULL REFERENCES securities
 ) STRICT;
 
 CREATE TABLE transactions (

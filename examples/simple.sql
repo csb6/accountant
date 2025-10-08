@@ -8,17 +8,17 @@
 pragma foreign_keys = ON;
 
 -- Securities
-INSERT INTO stocks VALUES ("F", "Ford");
-INSERT INTO stocks VALUES ("GRMN", "Garmin");
+INSERT INTO securities VALUES ("F", "Ford");
+INSERT INTO securities VALUES ("GRMN", "Garmin");
 
 -- Accounts
 INSERT INTO accounts VALUES (6, "Assets:Checking", 1);
 INSERT INTO accounts VALUES (7, "Assets:Savings", 1);
 INSERT INTO accounts VALUES (8, "Assets:Investment", 5);
 INSERT INTO accounts VALUES (9, "Assets:Investment:F", 4);
-INSERT INTO account_stocks VALUES (9, "F");
+INSERT INTO account_securities VALUES (9, "F");
 INSERT INTO accounts VALUES (10, "Assets:Investment:GRMN", 4);
-INSERT INTO account_stocks VALUES (10, "GRMN");
+INSERT INTO account_securities VALUES (10, "GRMN");
 INSERT INTO accounts VALUES (11, "Income:Salary", 2);
 
 -- Transactions
