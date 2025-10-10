@@ -25,6 +25,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #include "models/Roles.hpp"
 #include "views/AccountsView.hpp"
 #include "views/AboutDialog.hpp"
+#include "views/SecurityEditor.hpp"
 #include "TransactionsView.hpp"
 #include "ui_mainwindow.h"
 
@@ -51,19 +52,17 @@ MainWindow::MainWindow(AccountTree& account_tree, DatabaseManager& db_manager)
     : QMainWindow(), m_impl(new Impl(&account_tree))
 {
     m_impl->ui.setupUi(this);
-    m_impl->ui.file_open->setShortcut(QKeySequence::Open);
 
     connect(this, &MainWindow::database_path_changed, &db_manager, &DatabaseManager::load_database);
     connect(&db_manager, &DatabaseManager::database_closing, this, &MainWindow::reset);
-
     connect(&db_manager, &DatabaseManager::failed_to_load_database, [this](const QString& message) {
         auto* error_dialog = new QErrorMessage(this);
         error_dialog->setAttribute(Qt::WA_DeleteOnClose);
         error_dialog->showMessage(message);
     });
 
-    auto* accounts_view = new AccountsView(account_tree, db_manager);
-    connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
+    // Menus
+    m_impl->ui.file_open->setShortcut(QKeySequence::Open);
     connect(m_impl->ui.file_open, &QAction::triggered, [this] {
         auto* file_dialog = new QFileDialog(this);
         file_dialog->setNameFilter(u"*.db"_s);
@@ -75,11 +74,18 @@ MainWindow::MainWindow(AccountTree& account_tree, DatabaseManager& db_manager)
         });
         file_dialog->show();
     });
+    connect(m_impl->ui.new_security, &QAction::triggered, [this, &db_manager] {
+        auto* security_editor = new SecurityEditor(db_manager.database(), this);
+        security_editor->show();
+    });
     connect(m_impl->ui.show_licenses, &QAction::triggered, [this] {
         auto* about_box = new AboutDialog(this);
         about_box->show();
     });
 
+    // Tabs
+    auto* accounts_view = new AccountsView(account_tree, db_manager);
+    connect(accounts_view, &AccountsView::activated, this, &MainWindow::open_transactions_view);
     m_impl->ui.tabs->addTab(accounts_view, "Accounts");
     m_impl->ui.tabs->setTabToolTip(0, "Accounts");
     // Accounts tab cannot be closed

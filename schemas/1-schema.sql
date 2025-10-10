@@ -2,7 +2,8 @@ pragma user_version = 1;
 
 CREATE TABLE securities (
     symbol TEXT PRIMARY KEY,
-    description TEXT NOT NULL
+    description TEXT NOT NULL DEFAULT "",
+    CHECK (symbol != "")
 ) STRICT;
 
 CREATE TABLE account_kinds (
@@ -38,7 +39,7 @@ INSERT INTO accounts VALUES (5, "Liabilities", 5);
 
 CREATE TABLE account_securities (
     id INTEGER PRIMARY KEY REFERENCES accounts ON DELETE CASCADE,
-    symbol TEXT NOT NULL REFERENCES securities
+    symbol TEXT NOT NULL REFERENCES securities ON DELETE RESTRICT
 ) STRICT;
 
 CREATE TABLE transactions (

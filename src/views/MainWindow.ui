@@ -77,7 +77,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     </property>
     <addaction name="show_licenses"/>
    </widget>
+   <widget class="QMenu" name="securities_menu">
+    <property name="title">
+     <string>Securities</string>
+    </property>
+    <addaction name="new_security"/>
+   </widget>
    <addaction name="file_menu"/>
+   <addaction name="securities_menu"/>
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -92,6 +99,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::AboutRole</enum>
+   </property>
+  </action>
+  <action name="new_security">
+   <property name="text">
+    <string>New Security...</string>
+   </property>
+   <property name="toolTip">
+    <string>Create a new security</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
    </property>
   </action>
  </widget>

@@ -51,3 +51,8 @@ enum AccountKind {
     ACCOUNT_KIND_STOCK,
     ACCOUNT_KIND_PLACEHOLDER
 };
+
+enum SecuritiesTableColumn {
+    SECURITIES_SYMBOL,
+    SECURITIES_DESCRIPTION
+};
