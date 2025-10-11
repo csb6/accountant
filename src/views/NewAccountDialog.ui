@@ -42,12 +42,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
         <string>Account Name</string>
        </property>
        <property name="buddy">
-        <cstring>account</cstring>
+        <cstring>account_name_view</cstring>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="account">
+      <widget class="QLineEdit" name="account_name_view">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -66,15 +66,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
      <item row="1" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Account Type</string>
+        <string>Account Kind</string>
        </property>
        <property name="buddy">
-        <cstring>account_type</cstring>
+        <cstring>account_kind_view</cstring>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="account_type">
+      <widget class="QComboBox" name="account_kind_view">
        <property name="minimumSize">
         <size>
          <width>200</width>
@@ -84,7 +84,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QTreeView" name="parent_accounts">
+      <widget class="QTreeView" name="parent_accounts_view">
        <property name="editTriggers">
         <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
        </property>
@@ -94,6 +94,26 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
        <attribute name="headerVisible">
         <bool>false</bool>
        </attribute>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="symbol_label">
+       <property name="text">
+        <string>Symbol</string>
+       </property>
+       <property name="buddy">
+        <cstring>symbol_view</cstring>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="symbol_view">
+       <property name="minimumSize">
+        <size>
+         <width>200</width>
+         <height>0</height>
+        </size>
+       </property>
       </widget>
      </item>
     </layout>
@@ -111,7 +131,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
   </layout>
  </widget>
  <tabstops>
-  <tabstop>account</tabstop>
+  <tabstop>account_name_view</tabstop>
  </tabstops>
  <resources/>
  <connections>

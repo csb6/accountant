@@ -37,6 +37,8 @@ public:
     ~NewAccountDialog() noexcept;
 signals:
     void account_created(const QModelIndex& parent, const AccountFields&);
+public slots:
+    void accept() override;
 private:
     struct Impl;
     Impl* m_impl;

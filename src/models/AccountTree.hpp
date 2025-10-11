@@ -28,6 +28,7 @@ class DatabaseManager;
 
 struct AccountFields {
     QString name;
+    QString symbol;
     AccountKind kind;
 };
 Q_DECLARE_METATYPE(AccountFields);

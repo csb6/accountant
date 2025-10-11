@@ -95,6 +95,12 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         auto account_id = query.value(0).toInt();
         QStandardItemModel::setData(index, account_id, Account_ID_Role);
         QStandardItemModel::setData(index, static_cast<int>(fields.kind), Account_Kind_Role);
+        if(fields.kind == ACCOUNT_KIND_STOCK) {
+            sql_helpers::prepare(query, u"INSERT INTO account_securities VALUES (?, ?)"_s);
+            query.bindValue(0, account_id);
+            query.bindValue(1, fields.symbol);
+            sql_helpers::exec(query);
+        }
         return true;
     }
     return QStandardItemModel::setData(index, value, role);
