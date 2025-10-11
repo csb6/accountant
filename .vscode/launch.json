@@ -13,6 +13,12 @@
             "osx": {
                 "program": "build/src/qaccountant.app/Contents/MacOS/qaccountant"
             }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Launch account_tree_tests",
+            "program": "build/tests/account_tree_tests",
         }
     ]
 }

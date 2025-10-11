@@ -8,6 +8,16 @@ endif()
 
 qt_standard_project_setup()
 
+qt_add_library(util OBJECT util/sql_helpers.cpp)
+target_include_directories(util PUBLIC util ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(util PUBLIC cxx_std_20)
+target_link_libraries(util PUBLIC Qt::Sql)
+
+qt_add_library(models STATIC models/AccountTree.cpp models/AccountTransactions.cpp models/DatabaseManager.cpp)
+target_include_directories(models PUBLIC models ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_features(models PUBLIC cxx_std_20)
+target_link_libraries(models PUBLIC Qt::Core Qt::Gui Qt::Sql "util")
+
 qt_add_executable(qaccountant
     MACOSX_BUNDLE
     main.cpp
@@ -16,21 +26,17 @@ qt_add_executable(qaccountant
     views/TransactionsView.ui views/TransactionsView.cpp
     views/AboutDialog.ui views/AboutDialog.cpp
     views/SecurityEditor.ui views/SecurityEditor.cpp
-    views/NewAccountDialog.ui views/NewAccountDialog.cpp
-    models/AccountTree.cpp
-    models/AccountTransactions.cpp
-    models/DatabaseManager.cpp
-    util/sql_helpers.cpp)
+    views/NewAccountDialog.ui views/NewAccountDialog.cpp)
 
-target_include_directories(qaccountant PUBLIC .)
+target_include_directories(qaccountant PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(qaccountant PUBLIC cxx_std_20)
 if(WITH_COMPILE_TIME_TRACE)
     target_compile_options(qaccountant PUBLIC -ftime-trace=compile_time_report)
 endif()
-target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets)
+target_link_libraries(qaccountant PUBLIC Qt::Core Qt::Sql Qt::Widgets models util)
 
 qt_add_executable(generate_about_text "${CMAKE_SOURCE_DIR}/tools/generate_about_text.cpp" "${CMAKE_SOURCE_DIR}/tools/spdx_parser.cpp")
-target_include_directories(generate_about_text PUBLIC .)
+target_include_directories(generate_about_text PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_precompile_headers(generate_about_text PRIVATE <qobject.h>)
 target_compile_features(generate_about_text PUBLIC cxx_std_20)
 target_link_libraries(generate_about_text PUBLIC Qt::Core)

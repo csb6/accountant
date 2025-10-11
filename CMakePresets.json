@@ -25,6 +25,7 @@
             },
             "cacheVariables": {
                 "CMAKE_PREFIX_PATH": "/opt/homebrew;/opt/homebrew/sqlite3;/usr/local/opt;/usr/local;/usr/local/opt/sqlite3;$env{SDKROOT};$env{SDKROOT}/System/Library/Frameworks/",
+                "CMAKE_AR": "/usr/bin/ar",
                 "CMAKE_FIND_USE_CMAKE_SYSTEM_PATH": false,
                 "CMAKE_FIND_USE_SYSTEM_ENVIRONMENT_PATH": false
             }

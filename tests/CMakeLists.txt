@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.25)
 
 qt_standard_project_setup()
 
-qt_add_executable(model_tests model_tests.cpp)
-add_test(NAME model_tests COMMAND model_tests)
-target_compile_features(model_tests PUBLIC cxx_std_20)
-target_link_libraries(model_tests PRIVATE Qt::Core Qt::Test)
+qt_add_executable(account_tree_tests AccountTreeTests.cpp)
+add_test(NAME account_tree_tests COMMAND account_tree_tests)
+target_compile_features(account_tree_tests PUBLIC cxx_std_20)
+target_link_libraries(account_tree_tests PRIVATE Qt::Test models)
+target_precompile_headers(account_tree_tests REUSE_FROM generate_about_text)
