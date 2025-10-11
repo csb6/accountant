@@ -56,12 +56,7 @@ AccountsView::AccountsView(AccountTree& account_tree, DatabaseManager& db_manage
         auto parent = selected_items[0];
         auto* dialog = new NewAccountDialog(*m_impl->account_tree, *m_impl->db_manager, parent, this);
         connect(dialog, &NewAccountDialog::account_created, [this](const QModelIndex& parent_account, const AccountFields& account_fields) {
-            auto* parent_item = m_impl->account_tree->itemFromIndex(parent_account);
-            parent_item->appendRow(new QStandardItem(account_fields.name));
-            auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
-            QVariant value;
-            value.setValue(account_fields);
-            m_impl->account_tree->setData(new_item, value);
+            auto new_item = m_impl->account_tree->appendRow(account_fields, parent_account);
             m_impl->ui.tree_view->setCurrentIndex(new_item);
             m_impl->update_button_statuses(new_item);
         });

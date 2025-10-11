@@ -84,11 +84,10 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         // Set the item's display data (i.e. the account name). This is needed when
         // building the account path
         QStandardItemModel::setData(index, fields.name, role);
-        auto account_path = index.data(Account_Path_Role).toString();
+        auto account_path = data(index, Account_Path_Role).toString();
         QSqlQuery query{m_impl->db_manager->database()};
         sql_helpers::prepare(query, u"INSERT INTO accounts(name, kind) VALUES (?, ?) RETURNING id"_s);
         query.bindValue(0, account_path);
-        // TODO: support stock fields
         query.bindValue(1, static_cast<int>(fields.kind));
         sql_helpers::exec(query);
         sql_helpers::next(query);
@@ -104,6 +103,17 @@ bool AccountTree::setData(const QModelIndex& index, const QVariant& value, int r
         return true;
     }
     return QStandardItemModel::setData(index, value, role);
+}
+
+QModelIndex AccountTree::appendRow(const AccountFields& fields, const QModelIndex& parent)
+{
+    auto* parent_item = itemFromIndex(parent);
+    parent_item->appendRow(new QStandardItem(fields.name));
+    auto new_item = parent_item->child(parent_item->rowCount() - 1)->index();
+    QVariant value;
+    value.setValue(fields);
+    setData(new_item, value);
+    return new_item;
 }
 
 bool AccountTree::removeRows(int row, int count, const QModelIndex& parent)
