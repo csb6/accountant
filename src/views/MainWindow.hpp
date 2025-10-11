@@ -33,7 +33,7 @@ signals:
 public slots:
     void reset();
 private slots:
-    void open_transactions_view(QModelIndex account);
+    void open_transactions_view(const QModelIndex& account);
 private:
     struct Impl;
     Impl* m_impl;

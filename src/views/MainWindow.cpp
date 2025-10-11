@@ -109,7 +109,7 @@ void MainWindow::reset()
     }
 }
 
-void MainWindow::open_transactions_view(QModelIndex account)
+void MainWindow::open_transactions_view(const QModelIndex& account)
 {
     auto tab_name = account.data(Account_Path_Role).toString();
     // Don't add new tab if already open
