@@ -65,7 +65,7 @@ void DatabaseManager::load_database(QString database_path)
         try {
             QSqlQuery query{standby_db};
             sql_helpers::exec(query, u"pragma foreign_keys = ON"_s);
-            sql_helpers::upgrade_schema_if_needed(standby_db, latest_schema_version, u"schemas"_s);
+            sql_helpers::upgrade_schema_if_needed(standby_db, latest_schema_version, u":/qaccountant/schemas"_s);
         } catch(const sql_helpers::Error& err) {
             // For some reason, Qt does not check if the SQLite database that it opened is actually
             // a valid database file, so we do not find out until attempting to execute the first
