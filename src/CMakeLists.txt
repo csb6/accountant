@@ -49,7 +49,6 @@ add_custom_command(
 )
 
 qt_add_executable(qaccountant
-    MACOSX_BUNDLE
     main.cpp
     views/MainWindow.cpp
     views/AccountsView.cpp
@@ -77,7 +76,21 @@ if(SQL_QUERY_LOGGING)
     target_link_libraries(qaccountant PUBLIC SQLite::SQLite3)
 endif()
 
-if(APPLE)
+if(APPLE AND BUILD_APP_BUNDLE)
+    set_target_properties(qaccountant PROPERTIES MACOSX_BUNDLE ON)
+    set(RESOURCE_DIR "${CMAKE_SOURCE_DIR}/resources")
+    set(ICON_DIR "${RESOURCE_DIR}/icon.iconset")
+    set(ICNS_FILENAME "icon.icns")
+    set(ICNS_PATH "${CMAKE_CURRENT_BINARY_DIR}/${ICNS_FILENAME}")
+    add_custom_command(
+        OUTPUT "${ICNS_PATH}"
+        COMMAND iconutil -o "${ICNS_PATH}" -c icns "${ICON_DIR}"
+        DEPENDS ${ICON_DIR}/icon_16x16.png ${ICON_DIR}/icon_32x32.png ${ICON_DIR}/icon_64x64.png
+                ${ICON_DIR}/icon_128x128.png ${ICON_DIR}/icon_256x256.png ${ICON_DIR}/icon_512x512.png)
+    set(MACOSX_BUNDLE_ICON_FILE "${ICNS_FILENAME}")
+    set_source_files_properties("${ICNS_PATH}" PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
+    target_sources(qaccountant PRIVATE "${ICNS_PATH}")
+
     find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${QT6_INSTALL_PREFIX}/${QT6_INSTALL_BINS}")
     # Fixup the .app bundle to include/use all of the shared libraries needed by Qt
     # Seem to need to run this twice for some reason (fails with error on first run)

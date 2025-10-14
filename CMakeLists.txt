@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.25)
 
-project(QAccountant LANGUAGES CXX)
+project(QAccountant LANGUAGES CXX VERSION 0.1)
 
 set(COMP_LIST Core Sql Widgets)
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
@@ -28,6 +28,10 @@ option(SQL_QUERY_LOGGING "Log text of queries as they are sent to SQLite" OFF)
 if(SQL_QUERY_LOGGING)
     message(NOTICE "NOTE: The installation of SQLite being used MUST be the same as the installation used by Qt's SQlite plugin")
     find_package(SQLite3 REQUIRED)
+endif()
+
+if(APPLE)
+    option(BUILD_APP_BUNDLE "Build macOS .app bundle" OFF)
 endif()
 
 set(CMAKE_AUTOUIC OFF)

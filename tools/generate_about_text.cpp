@@ -168,6 +168,10 @@ int main(int argc, char **argv)
         "3](https://www.gnu.org/licenses/gpl-3.0.html) and comes with ABSOLUTELY "
         "NO WARRANTY.\n\n"
         "----\n\n"
+        "App icon is [\"Bank, cash, finance, building, government, banking, financial, payment, currency\"](https://www.iconfinder.com/iconsets/banking-finance-29) by mr icons\n"
+        "- Modified to have white background and scaled to different resolutions\n"
+        "- License: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0)\n\n"
+        "----\n\n"
         "This program uses the following third-party libraries:\n");
     #ifdef SPDX_PROVIDED
     write_packages_to_markdown(package_info, transitive_dependencies, output_file);
