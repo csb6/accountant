@@ -8,6 +8,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     list(APPEND COMP_LIST Test)
 endif()
 
+set(QT_NO_CREATE_VERSIONLESS_TARGETS ON)
 find_package(Qt6 REQUIRED COMPONENTS ${COMP_LIST})
 
 option(WITH_OFX "Build with support for reading OFX files" OFF)
