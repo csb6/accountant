@@ -74,7 +74,7 @@ MainWindow::MainWindow(AccountTree& account_tree, DatabaseManager& db_manager)
         });
         file_dialog->show();
     });
-    connect(m_impl->ui.new_security, &QAction::triggered, [this, &db_manager] {
+    connect(m_impl->ui.open_security_editor, &QAction::triggered, [this, &db_manager] {
         auto* security_editor = new SecurityEditor(db_manager.database(), this);
         security_editor->show();
     });

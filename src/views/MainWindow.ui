@@ -81,7 +81,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <property name="title">
      <string>Securities</string>
     </property>
-    <addaction name="new_security"/>
+    <addaction name="open_security_editor"/>
    </widget>
    <addaction name="file_menu"/>
    <addaction name="securities_menu"/>
@@ -101,12 +101,12 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
     <enum>QAction::MenuRole::AboutRole</enum>
    </property>
   </action>
-  <action name="new_security">
+  <action name="open_security_editor">
    <property name="text">
-    <string>New Security...</string>
+    <string>Security Editor...</string>
    </property>
    <property name="toolTip">
-    <string>Create a new security</string>
+    <string>View/edit securities</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>
