@@ -30,6 +30,7 @@ if(SQL_QUERY_LOGGING)
     find_package(SQLite3 REQUIRED)
 endif()
 
+set(CMAKE_AUTOUIC OFF)
 add_subdirectory(src)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)

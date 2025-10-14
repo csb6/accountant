@@ -51,12 +51,19 @@ add_custom_command(
 qt_add_executable(qaccountant
     MACOSX_BUNDLE
     main.cpp
-    views/MainWindow.ui views/MainWindow.cpp
-    views/AccountsView.ui views/AccountsView.cpp
-    views/TransactionsView.ui views/TransactionsView.cpp
-    views/AboutDialog.ui views/AboutDialog.cpp
-    views/SecurityEditor.ui views/SecurityEditor.cpp
-    views/NewAccountDialog.ui views/NewAccountDialog.cpp)
+    views/MainWindow.cpp
+    views/AccountsView.cpp
+    views/TransactionsView.cpp
+    views/AboutDialog.cpp
+    views/SecurityEditor.cpp
+    views/NewAccountDialog.cpp)
+qt_add_ui(qaccountant SOURCES
+    views/MainWindow.ui
+    views/AccountsView.ui
+    views/TransactionsView.ui
+    views/AboutDialog.ui
+    views/SecurityEditor.ui
+    views/NewAccountDialog.ui)
 target_include_directories(qaccountant PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(qaccountant PUBLIC cxx_std_20)
 if(WITH_COMPILE_TIME_TRACE)
