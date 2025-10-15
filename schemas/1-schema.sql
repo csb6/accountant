@@ -1,4 +1,5 @@
 pragma user_version = 1;
+
 pragma foreign_keys = ON;
 
 CREATE TABLE securities (
