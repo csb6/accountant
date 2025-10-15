@@ -12,6 +12,13 @@ class AccountTreeTests : public QObject {
 
     DatabaseManager db_manager;
 private slots:
+    void initTestCase()
+    {
+        connect(&db_manager, &DatabaseManager::failed_to_load_database, [](QString err_message) {
+            QFAIL(err_message.toStdString().c_str());
+        });
+    }
+
     void empty_tree()
     {
         AccountTree tree{db_manager};
