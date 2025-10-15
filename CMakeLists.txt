@@ -35,7 +35,6 @@ if(APPLE)
     option(BUILD_APP_BUNDLE "Build macOS .app bundle" OFF)
 endif()
 
-set(CMAKE_AUTOUIC OFF)
 add_subdirectory(src)
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
