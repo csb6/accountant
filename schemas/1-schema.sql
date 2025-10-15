@@ -1,4 +1,5 @@
 pragma user_version = 1;
+pragma foreign_keys = ON;
 
 CREATE TABLE securities (
     symbol TEXT PRIMARY KEY,
@@ -11,15 +12,15 @@ CREATE TABLE account_kinds (
     name TEXT UNIQUE NOT NULL
 ) STRICT;
 
-INSERT INTO account_kinds VALUES (1, "Bank");
+INSERT INTO account_kinds VALUES (unicode('B'), "Bank");
 
-INSERT INTO account_kinds VALUES (2, "Income");
+INSERT INTO account_kinds VALUES (unicode('I'), "Income");
 
-INSERT INTO account_kinds VALUES (3, "Expense");
+INSERT INTO account_kinds VALUES (unicode('E'), "Expense");
 
-INSERT INTO account_kinds VALUES (4, "Stock");
+INSERT INTO account_kinds VALUES (unicode('S'), "Stock");
 
-INSERT INTO account_kinds VALUES (5, "Placeholder");
+INSERT INTO account_kinds VALUES (unicode('P'), "Placeholder");
 
 CREATE TABLE accounts (
     id INTEGER PRIMARY KEY,
@@ -27,15 +28,15 @@ CREATE TABLE accounts (
     kind INTEGER NOT NULL REFERENCES account_kinds
 ) STRICT;
 
-INSERT INTO accounts VALUES (1, "Assets", 5);
+INSERT INTO accounts VALUES (1, "Assets", unicode('P'));
 
-INSERT INTO accounts VALUES (2, "Equity", 5);
+INSERT INTO accounts VALUES (2, "Equity", unicode('P'));
 
-INSERT INTO accounts VALUES (3, "Expenses", 5);
+INSERT INTO accounts VALUES (3, "Expenses", unicode('P'));
 
-INSERT INTO accounts VALUES (4, "Income", 5);
+INSERT INTO accounts VALUES (4, "Income", unicode('P'));
 
-INSERT INTO accounts VALUES (5, "Liabilities", 5);
+INSERT INTO accounts VALUES (5, "Liabilities", unicode('P'));
 
 CREATE TABLE account_securities (
     id INTEGER PRIMARY KEY REFERENCES accounts ON DELETE CASCADE,

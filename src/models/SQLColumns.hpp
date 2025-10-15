@@ -45,11 +45,11 @@ enum AccountsTableColumn {
 };
 
 enum AccountKind {
-    ACCOUNT_KIND_BANK = 1,
-    ACCOUNT_KIND_INCOME,
-    ACCOUNT_KIND_EXPENSE,
-    ACCOUNT_KIND_STOCK,
-    ACCOUNT_KIND_PLACEHOLDER
+    ACCOUNT_KIND_BANK = 'B',
+    ACCOUNT_KIND_INCOME = 'I',
+    ACCOUNT_KIND_EXPENSE = 'E',
+    ACCOUNT_KIND_STOCK = 'S',
+    ACCOUNT_KIND_PLACEHOLDER = 'P'
 };
 
 enum SecuritiesTableColumn {

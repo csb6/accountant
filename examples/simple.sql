@@ -1,10 +1,3 @@
--- Account kinds:
---   Bank = 1
---   Income = 2
---   Expense = 3
---   Stock = 4
---   Placeholder = 5
-
 pragma foreign_keys = ON;
 
 -- Securities
@@ -12,14 +5,14 @@ INSERT INTO securities VALUES ("F", "Ford");
 INSERT INTO securities VALUES ("GRMN", "Garmin");
 
 -- Accounts
-INSERT INTO accounts VALUES (6, "Assets:Checking", 1);
-INSERT INTO accounts VALUES (7, "Assets:Savings", 1);
-INSERT INTO accounts VALUES (8, "Assets:Investment", 5);
-INSERT INTO accounts VALUES (9, "Assets:Investment:F", 4);
+INSERT INTO accounts VALUES (6, "Assets:Checking", unicode('B'));
+INSERT INTO accounts VALUES (7, "Assets:Savings", unicode('B'));
+INSERT INTO accounts VALUES (8, "Assets:Investment", unicode('P'));
+INSERT INTO accounts VALUES (9, "Assets:Investment:F", unicode('S'));
 INSERT INTO account_securities VALUES (9, "F");
-INSERT INTO accounts VALUES (10, "Assets:Investment:GRMN", 4);
+INSERT INTO accounts VALUES (10, "Assets:Investment:GRMN", unicode('S'));
 INSERT INTO account_securities VALUES (10, "GRMN");
-INSERT INTO accounts VALUES (11, "Income:Salary", 2);
+INSERT INTO accounts VALUES (11, "Income:Salary", unicode('I'));
 
 -- Transactions
 INSERT INTO transactions VALUES (1, "2025-06-10", "Paycheck", 11, 6);
